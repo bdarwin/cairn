@@ -4,6 +4,7 @@ Runnable programs. Each ends with its real output pasted in a comment, and every
 comes from one of them. This is a separate Maven project, not part of the cairn build.
 
 ```
+mvn -q install -DskipTests      # in the repository root, once
 cd examples
 mvn -q compile
 java -cp target/classes io.github.bdarwin.cairn.examples.probes.ProbeExpectContinue
@@ -21,3 +22,9 @@ java -cp target/classes io.github.bdarwin.cairn.examples.probes.ProbeExpectConti
 
 `ProbeLargeBody` and `ProbeFsync` take a directory to write in. `ProbeLargeBody` needs room for
 three copies of the file.
+
+## Milestones
+
+| Example | What it shows |
+|---|---|
+| `ObjectsEndToEnd` | PUT and GET at 1 KiB to 1 GiB through the AWS SDK, concurrent small PUTs, an `aws` CLI round trip |

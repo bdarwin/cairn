@@ -6,5 +6,9 @@ JDK. It keeps objects on a local disk, one directory per object, with no databas
 The goal is that unmodified S3 clients work against it without noticing: the AWS SDK for Java v2,
 the `aws` CLI, MinIO's `mc`, and DuckDB's `httpfs`.
 
-**Status:** nothing serves requests yet. The groundwork is done: [Probes](probes.md) records what
-each unknown turned out to be on a real machine, and what that decided about the design.
+**Status:** buckets and single objects work end to end with SigV4: PUT, GET with ranges, HEAD and
+DELETE. The AWS SDK for Java v2 and the `aws` CLI round-trip files byte for byte. Listing,
+multipart upload and the rest are next. See [Getting started](getting-started.md).
+
+- [Storage](storage.md): how objects sit on disk, and why a crash never tears one.
+- [Probes](probes.md): what each unknown turned out to be on a real machine, and what that decided.

@@ -20,7 +20,9 @@ theme:
 
 nav:
   - Home: index.md
+  - Getting started: getting-started.md
   - Design:
+      - Storage: storage.md
       - Probes: probes.md
 
 markdown_extensions:

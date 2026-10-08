@@ -66,6 +66,13 @@
             <artifactId>s3</artifactId>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <!-- The SDK computes CRC64NVME only through the CRT. -->
+            <groupId>software.amazon.awssdk.crt</groupId>
+            <artifactId>aws-crt</artifactId>
+            <version>0.48.5</version>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 
     <build>
