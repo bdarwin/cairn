@@ -1,0 +1,42 @@
+site_name: cairn
+site_description: An S3-compatible object server in Java.
+site_url: https://bdarwin.github.io/cairn/
+repo_url: https://github.com/bdarwin/cairn
+repo_name: bdarwin/cairn
+edit_uri: edit/main/docs/
+copyright: Apache 2.0 &middot; built by Darwin Baisa
+
+docs_dir: docs
+
+theme:
+  name: material
+  language: en
+  features:
+    - navigation.sections
+    - navigation.top
+    - toc.follow
+    - search.highlight
+    - content.code.copy
+
+nav:
+  - Home: index.md
+  - Design:
+      - Probes: probes.md
+
+markdown_extensions:
+  - admonition
+  - attr_list
+  - tables
+  - toc:
+      permalink: true
+      toc_depth: 3
+  - pymdownx.highlight
+  - pymdownx.superfences
+
+plugins:
+  - search
+
+validation:
+  omitted_files: warn
+  absolute_links: warn
+  unrecognized_links: warn

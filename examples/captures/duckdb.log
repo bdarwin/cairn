@@ -1,0 +1,155 @@
+=== #1 PUT /probe/duck/x.parquet
+  Accept: */*
+  Authorization: AWS4-HMAC-SHA256 Credential=probekey/20261008/us-east-1/s3/aws4_request, SignedHeaders=content-type;host;x-amz-content-sha256;x-amz-date, Signature=1907f673c296c812bcf5fae78f8ee4b94f57451e788f69fac5e7ad98655fd341
+  Content-length: 7999489
+  Content-type: application/octet-stream
+  Expect: 100-continue
+  Host: localhost:9000
+  User-agent: duckdb/v1.5.6(osx_arm64) cli 069cc9f9b5
+  X-amz-content-sha256: fdd2c8ea7af14810112992ade1870832521cc88c3435151fca0c678bd3298261
+  X-amz-date: 20261008T133157Z
+  -- body: 7999489 bytes on the wire
+=== #2 GET /probe/?encoding-type=url&list-type=2&prefix=duck%2F
+  Accept: */*
+  Authorization: AWS4-HMAC-SHA256 Credential=probekey/20261008/us-east-1/s3/aws4_request, SignedHeaders=host;x-amz-content-sha256;x-amz-date, Signature=75d7ea0fa373b66ef4e10304042444f96ef8265fee4dbb03ac6b89c462699e7f
+  Host: localhost:9000
+  User-agent: duckdb/v1.5.6(osx_arm64) cli 069cc9f9b5
+  X-amz-content-sha256: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+  X-amz-date: 20261008T133157Z
+=== #3 GET /probe/duck/x.parquet
+  Accept: */*
+  Authorization: AWS4-HMAC-SHA256 Credential=probekey/20261008/us-east-1/s3/aws4_request, SignedHeaders=host;x-amz-content-sha256;x-amz-date, Signature=a196c23133120c38fbfbf91e139bc67d5e946e5b30d774f513e3a3096ce03e19
+  Host: localhost:9000
+  Range: bytes=7983105-7999488
+  User-agent: duckdb/v1.5.6(osx_arm64) cli 069cc9f9b5
+  X-amz-content-sha256: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+  X-amz-date: 20261008T133157Z
+=== #4 GET /probe/duck/x.parquet
+  Accept: */*
+  Authorization: AWS4-HMAC-SHA256 Credential=probekey/20261008/us-east-1/s3/aws4_request, SignedHeaders=host;x-amz-content-sha256;x-amz-date, Signature=a196c23133120c38fbfbf91e139bc67d5e946e5b30d774f513e3a3096ce03e19
+  Host: localhost:9000
+  Range: bytes=7862066-7983104
+  User-agent: duckdb/v1.5.6(osx_arm64) cli 069cc9f9b5
+  X-amz-content-sha256: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+  X-amz-date: 20261008T133157Z
+=== #6 GET /probe/duck/x.parquet
+  Accept: */*
+  Authorization: AWS4-HMAC-SHA256 Credential=probekey/20261008/us-east-1/s3/aws4_request, SignedHeaders=host;x-amz-content-sha256;x-amz-date, Signature=a196c23133120c38fbfbf91e139bc67d5e946e5b30d774f513e3a3096ce03e19
+  Host: localhost:9000
+  Range: bytes=4914225-5405996
+  User-agent: duckdb/v1.5.6(osx_arm64) cli 069cc9f9b5
+  X-amz-content-sha256: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+  X-amz-date: 20261008T133157Z
+=== #7 GET /probe/duck/x.parquet
+  Accept: */*
+  Authorization: AWS4-HMAC-SHA256 Credential=probekey/20261008/us-east-1/s3/aws4_request, SignedHeaders=host;x-amz-content-sha256;x-amz-date, Signature=a196c23133120c38fbfbf91e139bc67d5e946e5b30d774f513e3a3096ce03e19
+  Host: localhost:9000
+  Range: bytes=5896832-6388607
+  User-agent: duckdb/v1.5.6(osx_arm64) cli 069cc9f9b5
+  X-amz-content-sha256: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+  X-amz-date: 20261008T133157Z
+=== #9 GET /probe/duck/x.parquet
+  Accept: */*
+  Authorization: AWS4-HMAC-SHA256 Credential=probekey/20261008/us-east-1/s3/aws4_request, SignedHeaders=host;x-amz-content-sha256;x-amz-date, Signature=a196c23133120c38fbfbf91e139bc67d5e946e5b30d774f513e3a3096ce03e19
+  Host: localhost:9000
+  Range: bytes=1966421-2458193
+  User-agent: duckdb/v1.5.6(osx_arm64) cli 069cc9f9b5
+  X-amz-content-sha256: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+  X-amz-date: 20261008T133157Z
+=== #5 GET /probe/duck/x.parquet
+  Accept: */*
+  Authorization: AWS4-HMAC-SHA256 Credential=probekey/20261008/us-east-1/s3/aws4_request, SignedHeaders=host;x-amz-content-sha256;x-amz-date, Signature=a196c23133120c38fbfbf91e139bc67d5e946e5b30d774f513e3a3096ce03e19
+  Host: localhost:9000
+  Range: bytes=6879452-7371218
+  User-agent: duckdb/v1.5.6(osx_arm64) cli 069cc9f9b5
+  X-amz-content-sha256: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+  X-amz-date: 20261008T133157Z
+=== #8 GET /probe/duck/x.parquet
+  Accept: */*
+  Authorization: AWS4-HMAC-SHA256 Credential=probekey/20261008/us-east-1/s3/aws4_request, SignedHeaders=host;x-amz-content-sha256;x-amz-date, Signature=a196c23133120c38fbfbf91e139bc67d5e946e5b30d774f513e3a3096ce03e19
+  Host: localhost:9000
+  Range: bytes=2949041-3440801
+  User-agent: duckdb/v1.5.6(osx_arm64) cli 069cc9f9b5
+  X-amz-content-sha256: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+  X-amz-date: 20261008T133157Z
+=== #10 GET /probe/duck/x.parquet
+  Accept: */*
+  Authorization: AWS4-HMAC-SHA256 Credential=probekey/20261008/us-east-1/s3/aws4_request, SignedHeaders=host;x-amz-content-sha256;x-amz-date, Signature=a196c23133120c38fbfbf91e139bc67d5e946e5b30d774f513e3a3096ce03e19
+  Host: localhost:9000
+  Range: bytes=3931624-4423393
+  User-agent: duckdb/v1.5.6(osx_arm64) cli 069cc9f9b5
+  X-amz-content-sha256: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+  X-amz-date: 20261008T133157Z
+=== #11 GET /probe/duck/x.parquet
+  Accept: */*
+  Authorization: AWS4-HMAC-SHA256 Credential=probekey/20261008/us-east-1/s3/aws4_request, SignedHeaders=host;x-amz-content-sha256;x-amz-date, Signature=a196c23133120c38fbfbf91e139bc67d5e946e5b30d774f513e3a3096ce03e19
+  Host: localhost:9000
+  Range: bytes=4-492529
+  User-agent: duckdb/v1.5.6(osx_arm64) cli 069cc9f9b5
+  X-amz-content-sha256: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+  X-amz-date: 20261008T133157Z
+=== #12 GET /probe/duck/x.parquet
+  Accept: */*
+  Authorization: AWS4-HMAC-SHA256 Credential=probekey/20261008/us-east-1/s3/aws4_request, SignedHeaders=host;x-amz-content-sha256;x-amz-date, Signature=a196c23133120c38fbfbf91e139bc67d5e946e5b30d774f513e3a3096ce03e19
+  Host: localhost:9000
+  Range: bytes=983807-1475579
+  User-agent: duckdb/v1.5.6(osx_arm64) cli 069cc9f9b5
+  X-amz-content-sha256: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+  X-amz-date: 20261008T133157Z
+=== #13 POST /probe/duck/big.parquet?uploads=
+  Accept: */*
+  Authorization: AWS4-HMAC-SHA256 Credential=probekey/20261008/us-east-1/s3/aws4_request, SignedHeaders=content-type;host;x-amz-content-sha256;x-amz-date, Signature=0291e4f382e5ce3a55f28c8c8e04cef5696b61d804ddea19295d4abfee05eb7e
+  Content-length: 0
+  Content-type: application/octet-stream
+  Host: localhost:9000
+  User-agent: duckdb/v1.5.6(osx_arm64) cli 069cc9f9b5
+  X-amz-content-sha256: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+  X-amz-date: 20261008T133157Z
+=== #14 PUT /probe/duck/big.parquet?partNumber=1&uploadId=probe-upload
+  Accept: */*
+  Authorization: AWS4-HMAC-SHA256 Credential=probekey/20261008/us-east-1/s3/aws4_request, SignedHeaders=content-type;host;x-amz-content-sha256;x-amz-date, Signature=dbb19321e9119715360b326d0b37db9097bf2e818630ff36d156a4c557b5cd4f
+  Content-length: 80213616
+  Content-type: application/octet-stream
+  Expect: 100-continue
+  Host: localhost:9000
+  User-agent: duckdb/v1.5.6(osx_arm64) cli 069cc9f9b5
+  X-amz-content-sha256: 26b04278f8b72f1259d5a5e7f2aeafccb648ea1f81c37536a505f12c7a84cc5c
+  X-amz-date: 20261008T133158Z
+  -- body: 80213616 bytes on the wire
+=== #15 PUT /probe/duck/big.parquet?partNumber=2&uploadId=probe-upload
+  Accept: */*
+  Authorization: AWS4-HMAC-SHA256 Credential=probekey/20261008/us-east-1/s3/aws4_request, SignedHeaders=content-type;host;x-amz-content-sha256;x-amz-date, Signature=a3f1e76e91b70e8f31080293799f7632d243e0172d5f0e96b760bfae28bf1662
+  Content-length: 52416842
+  Content-type: application/octet-stream
+  Expect: 100-continue
+  Host: localhost:9000
+  User-agent: duckdb/v1.5.6(osx_arm64) cli 069cc9f9b5
+  X-amz-content-sha256: b14b3586790e3eeff5cf3a756921474601ae6029ea230c20e80928431141b140
+  X-amz-date: 20261008T133158Z
+  -- body: 52416842 bytes on the wire
+=== #16 POST /probe/duck/big.parquet?uploadId=probe-upload
+  Accept: */*
+  Authorization: AWS4-HMAC-SHA256 Credential=probekey/20261008/us-east-1/s3/aws4_request, SignedHeaders=content-type;host;x-amz-content-sha256;x-amz-date, Signature=b01b92a460b4b53382f42a5b391fdde5fe44e61d990954cd617cb35cb033a1f1
+  Content-length: 271
+  Content-type: application/octet-stream
+  Host: localhost:9000
+  User-agent: duckdb/v1.5.6(osx_arm64) cli 069cc9f9b5
+  X-amz-content-sha256: 046f1c266dda71846402c420a22814b8f95c49a1353b9a0579022be7409cf873
+  X-amz-date: 20261008T133158Z
+  -- body: 271 bytes on the wire
+  <CompleteMultipartUpload xmlns="http://s3.amazonaws.com/doc/2006-03-01/"><Part><ETag>"123c2102d30189516fca17e365b6140a"</ETag><PartNumber>1</PartNumber></Part><Part><ETag>"8c6439ceff6d4c69b02b081ecf55d9ad"</ETag><PartNumber>2</PartNumber></Part></CompleteMultipartUpload>
+=== #17 HEAD /probe/duck/big.parquet
+  Accept: */*
+  Authorization: AWS4-HMAC-SHA256 Credential=probekey/20261008/us-east-1/s3/aws4_request, SignedHeaders=host;x-amz-content-sha256;x-amz-date, Signature=2f31c22c9c9c9175f9dc67db7bc811ddac4403f5a9c1e3cf24a91a4b34b1efa1
+  Host: localhost:9000
+  User-agent: duckdb/v1.5.6(osx_arm64) cli 069cc9f9b5
+  X-amz-content-sha256: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+  X-amz-date: 20261008T133158Z
+=== #18 GET /probe/duck/big.parquet
+  Accept: */*
+  Authorization: AWS4-HMAC-SHA256 Credential=probekey/20261008/us-east-1/s3/aws4_request, SignedHeaders=host;x-amz-content-sha256;x-amz-date, Signature=7605ff8db105d11e4d1dbe442c21bac1deea37b0033f37b3d5b5599d0abf54ca
+  Host: localhost:9000
+  Range: bytes=132368314-132630457
+  User-agent: duckdb/v1.5.6(osx_arm64) cli 069cc9f9b5
+  X-amz-content-sha256: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+  X-amz-date: 20261008T133158Z

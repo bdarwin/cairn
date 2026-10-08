@@ -1,0 +1,153 @@
+=== #1 PUT /probe/sdk/bytes-10k
+  Amz-sdk-invocation-id: 60fad86d-f7bf-023d-c62c-2acaba712c9e
+  Amz-sdk-request: attempt=1; max=4
+  Authorization: AWS4-HMAC-SHA256 Credential=probekey/20261008/us-east-1/s3/aws4_request, SignedHeaders=amz-sdk-invocation-id;amz-sdk-request;content-encoding;content-length;content-type;host;x-amz-content-sha256;x-amz-date;x-amz-decoded-content-length;x-amz-sdk-checksum-algorithm;x-amz-trailer, Signature=8bd1fac1f06d4af5e1907f8bae53c84a4dac1a3efa7f30727c89c3137d171968
+  Connection: keep-alive
+  Content-encoding: aws-chunked
+  Content-length: 10536
+  Content-type: application/octet-stream
+  Host: localhost:9000
+  User-agent: aws-sdk-java/2.55.12 md/io#sync md/http#Apache5 ua/2.1 api/S3#2.55.x os/Mac_OS_X#26.5.2 lang/java#21.0.11 md/OpenJDK_64-Bit_Server_VM#21.0.11 md/vendor#Homebrew md/en_SG md/rb#b m/D,AJ,N,N,Z,b,U,e
+  X-amz-content-sha256: STREAMING-AWS4-HMAC-SHA256-PAYLOAD-TRAILER
+  X-amz-date: 20261008T133146Z
+  X-amz-decoded-content-length: 10240
+  X-amz-sdk-checksum-algorithm: CRC32
+  X-amz-trailer: x-amz-checksum-crc32
+  -- body: 10536 bytes on the wire
+    chunk header: 2800;chunk-signature=4ddfec755925b3b42985721b335b0a798d33815eacc61b880a2e3b846cdba9f0   (10240 bytes)
+    chunk header: 0;chunk-signature=feec2aded949d2e4346f56d51ee60e2d741ec2d33353d2246917ae974d48f010   (0 bytes)
+    trailer: x-amz-checksum-crc32:9+yNBQ==
+    trailer: x-amz-trailer-signature:dd6c98f9dfdfdaf99b9615988a6ae653c8a3daa6e5d2dff5fb6272a4c24eef5d
+    <empty line: end of trailers>
+  -- decoded payload: 10240 bytes
+=== #2 PUT /probe/sdk/bytes-1m
+  Amz-sdk-invocation-id: f9d9a252-7f9b-4505-fa9a-190c47ee4bbf
+  Amz-sdk-request: attempt=1; max=4
+  Authorization: AWS4-HMAC-SHA256 Credential=probekey/20261008/us-east-1/s3/aws4_request, SignedHeaders=amz-sdk-invocation-id;amz-sdk-request;content-encoding;content-length;content-type;host;x-amz-content-sha256;x-amz-date;x-amz-decoded-content-length;x-amz-sdk-checksum-algorithm;x-amz-trailer, Signature=233edea8762f39b2f9c33ce089144f3fd5080fa934d713aa3510bffeae1ba5db
+  Connection: keep-alive
+  Content-encoding: aws-chunked
+  Content-length: 1049503
+  Content-type: application/octet-stream
+  Expect: 100-continue
+  Host: localhost:9000
+  User-agent: aws-sdk-java/2.55.12 md/io#sync md/http#Apache5 ua/2.1 api/S3#2.55.x os/Mac_OS_X#26.5.2 lang/java#21.0.11 md/OpenJDK_64-Bit_Server_VM#21.0.11 md/vendor#Homebrew md/en_SG md/rb#b m/D,AJ,N,N,Z,b,U,e
+  X-amz-content-sha256: STREAMING-AWS4-HMAC-SHA256-PAYLOAD-TRAILER
+  X-amz-date: 20261008T133146Z
+  X-amz-decoded-content-length: 1048576
+  X-amz-sdk-checksum-algorithm: CRC32
+  X-amz-trailer: x-amz-checksum-crc32
+  -- body: 1049503 bytes on the wire
+    chunk header: 20000;chunk-signature=e58a7d0ecb0c23b8e4486b7459e3dbfa76098dd526e44c2ae3d5674bfe69d389   (131072 bytes)
+    chunk header: 20000;chunk-signature=fb6134042b400fb7ea197669d526f7c9563102901da0f4f812f867f266591579   (131072 bytes)
+    chunk header: 20000;chunk-signature=9d53d2143e48a943772c721bd9988b2729d6331bdb7e4524971aa9a9078e74cb   (131072 bytes)
+    ... 5 more chunk headers ...
+    chunk header: 0;chunk-signature=c5a091cc2810eb7c13ab5b38c286b59f3bd653e175564c553078f78efbfe12b6   (0 bytes)
+    trailer: x-amz-checksum-crc32:ZIRiNg==
+    trailer: x-amz-trailer-signature:71d1aa257e86df1af75a26c62d180fb98a00af621c0054ace39d6fbf2d384a6a
+    <empty line: end of trailers>
+  -- decoded payload: 1048576 bytes
+=== #3 PUT /probe/sdk/stream-1m
+  Amz-sdk-invocation-id: eaa9991c-171e-2ca9-5ce8-2b2aa3647495
+  Amz-sdk-request: attempt=1; max=4
+  Authorization: AWS4-HMAC-SHA256 Credential=probekey/20261008/us-east-1/s3/aws4_request, SignedHeaders=amz-sdk-invocation-id;amz-sdk-request;content-encoding;content-length;content-type;host;x-amz-content-sha256;x-amz-date;x-amz-decoded-content-length;x-amz-sdk-checksum-algorithm;x-amz-trailer, Signature=79e6a825f79e98ae368537e22f9d1a874289ae0acb20dd6ddd5af6493995b63a
+  Connection: keep-alive
+  Content-encoding: aws-chunked
+  Content-length: 1049503
+  Content-type: application/octet-stream
+  Expect: 100-continue
+  Host: localhost:9000
+  User-agent: aws-sdk-java/2.55.12 md/io#sync md/http#Apache5 ua/2.1 api/S3#2.55.x os/Mac_OS_X#26.5.2 lang/java#21.0.11 md/OpenJDK_64-Bit_Server_VM#21.0.11 md/vendor#Homebrew md/en_SG md/rb#s m/D,AJ,N,N,Z,b,U,e
+  X-amz-content-sha256: STREAMING-AWS4-HMAC-SHA256-PAYLOAD-TRAILER
+  X-amz-date: 20261008T133146Z
+  X-amz-decoded-content-length: 1048576
+  X-amz-sdk-checksum-algorithm: CRC32
+  X-amz-trailer: x-amz-checksum-crc32
+  -- body: 1049503 bytes on the wire
+    chunk header: 20000;chunk-signature=60b75ef65286c110f7425c85af1d1cf6b71a96a8e156ed96a42227c314ae2020   (131072 bytes)
+    chunk header: 20000;chunk-signature=ec6083fb7e6d2cc6e59c621ad52c7dc9ccad4b6d566ebdb294329e66c9c3b00f   (131072 bytes)
+    chunk header: 20000;chunk-signature=daee3987f10fa5437285673e30b1f2445315500cdb63ef1b662343cc290beb01   (131072 bytes)
+    ... 5 more chunk headers ...
+    chunk header: 0;chunk-signature=4c34e9ec553bbf988e5320b76cdd6aef1e0cea4876d69f201acf75c83786fcd1   (0 bytes)
+    trailer: x-amz-checksum-crc32:ZIRiNg==
+    trailer: x-amz-trailer-signature:a2b9643a14de0750667c3b5ff21141fe692de3afdbe5c24004b5a48ce531ee77
+    <empty line: end of trailers>
+  -- decoded payload: 1048576 bytes
+=== #4 PUT /probe/sdk/when-required-10k
+  Amz-sdk-invocation-id: 8c203c8d-722f-eacc-7265-4ff1f3a41bdd
+  Amz-sdk-request: attempt=1; max=4
+  Authorization: AWS4-HMAC-SHA256 Credential=probekey/20261008/us-east-1/s3/aws4_request, SignedHeaders=amz-sdk-invocation-id;amz-sdk-request;content-encoding;content-length;content-type;host;x-amz-content-sha256;x-amz-date;x-amz-decoded-content-length, Signature=ce636640f798a7c81d94bdbe18267bcb2aafe76ba195922a83a0c57005899d14
+  Connection: keep-alive
+  Content-encoding: aws-chunked
+  Content-length: 10415
+  Content-type: application/octet-stream
+  Host: localhost:9000
+  User-agent: aws-sdk-java/2.55.12 md/io#sync md/http#Apache5 ua/2.1 api/S3#2.55.x os/Mac_OS_X#26.5.2 lang/java#21.0.11 md/OpenJDK_64-Bit_Server_VM#21.0.11 md/vendor#Homebrew md/en_SG md/rb#b m/D,AJ,N,N,a,b,e
+  X-amz-content-sha256: STREAMING-AWS4-HMAC-SHA256-PAYLOAD
+  X-amz-date: 20261008T133146Z
+  X-amz-decoded-content-length: 10240
+  -- body: 10415 bytes on the wire
+    chunk header: 2800;chunk-signature=643cd89fd8bdbafa80312321858997e2637ecf778bbe1c490dd1e7fd8c39414f   (10240 bytes)
+    chunk header: 0;chunk-signature=4e3b79a45e12bafbd45658fdbc186dedf9bf7a6cab86c47f014d59271ff83434   (0 bytes)
+    <empty line: end of trailers>
+  -- decoded payload: 10240 bytes
+=== #5 GET /probe/sdk/bytes-10k
+  Amz-sdk-invocation-id: 0a4e2a0a-f274-e2f6-78fc-eff291469cc2
+  Amz-sdk-request: attempt=1; max=4
+  Authorization: AWS4-HMAC-SHA256 Credential=probekey/20261008/us-east-1/s3/aws4_request, SignedHeaders=amz-sdk-invocation-id;amz-sdk-request;host;x-amz-checksum-crc32;x-amz-content-sha256;x-amz-date;x-amz-te, Signature=1c4599cc5808be8f018144444dfeab670e70c422a8bc5a8340d8fc974d0b10ac
+  Connection: keep-alive
+  Host: localhost:9000
+  User-agent: aws-sdk-java/2.55.12 md/io#sync md/http#Apache5 ua/2.1 api/S3#2.55.x os/Mac_OS_X#26.5.2 lang/java#21.0.11 md/OpenJDK_64-Bit_Server_VM#21.0.11 md/vendor#Homebrew md/en_SG md/rt#b m/D,AJ,N,N,Z,b,U,e
+  X-amz-checksum-crc32: AAAAAA==
+  X-amz-content-sha256: UNSIGNED-PAYLOAD
+  X-amz-date: 20261008T133146Z
+  X-amz-te: append-md5
+=== #6 POST /probe/sdk/multipart?uploads
+  Amz-sdk-invocation-id: 517586c1-b5ea-1aa5-5459-76788891b41d
+  Amz-sdk-request: attempt=1; max=4
+  Authorization: AWS4-HMAC-SHA256 Credential=probekey/20261008/us-east-1/s3/aws4_request, SignedHeaders=amz-sdk-invocation-id;amz-sdk-request;content-length;content-type;host;x-amz-content-sha256;x-amz-date, Signature=67b36788b87e76aa832f53c3d507b86e014673220f4bcb49f08d4b7d798be471
+  Connection: keep-alive
+  Content-length: 0
+  Content-type: binary/octet-stream
+  Host: localhost:9000
+  User-agent: aws-sdk-java/2.55.12 md/io#sync md/http#Apache5 ua/2.1 api/S3#2.55.x os/Mac_OS_X#26.5.2 lang/java#21.0.11 md/OpenJDK_64-Bit_Server_VM#21.0.11 md/vendor#Homebrew md/en_SG m/D,AJ,N,N,Z,b,e
+  X-amz-content-sha256: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+  X-amz-date: 20261008T133146Z
+=== #7 PUT /probe/sdk/multipart?partNumber=1&uploadId=probe-upload
+  Amz-sdk-invocation-id: e444a25a-527b-a76a-d090-3ef37f979675
+  Amz-sdk-request: attempt=1; max=4
+  Authorization: AWS4-HMAC-SHA256 Credential=probekey/20261008/us-east-1/s3/aws4_request, SignedHeaders=amz-sdk-invocation-id;amz-sdk-request;content-encoding;content-length;content-type;host;x-amz-content-sha256;x-amz-date;x-amz-decoded-content-length;x-amz-sdk-checksum-algorithm;x-amz-trailer, Signature=15da2344129694aaea52adccc018aacde5fb3ba7041320d25a0c970bd85300d0
+  Connection: keep-alive
+  Content-encoding: aws-chunked
+  Content-length: 1049503
+  Content-type: application/octet-stream
+  Expect: 100-continue
+  Host: localhost:9000
+  User-agent: aws-sdk-java/2.55.12 md/io#sync md/http#Apache5 ua/2.1 api/S3#2.55.x os/Mac_OS_X#26.5.2 lang/java#21.0.11 md/OpenJDK_64-Bit_Server_VM#21.0.11 md/vendor#Homebrew md/en_SG md/rb#b m/D,AJ,N,N,Z,b,U,e
+  X-amz-content-sha256: STREAMING-AWS4-HMAC-SHA256-PAYLOAD-TRAILER
+  X-amz-date: 20261008T133146Z
+  X-amz-decoded-content-length: 1048576
+  X-amz-sdk-checksum-algorithm: CRC32
+  X-amz-trailer: x-amz-checksum-crc32
+  -- body: 1049503 bytes on the wire
+    chunk header: 20000;chunk-signature=9f54bb9460f3b31b75f5ca359f756d3a9a03561b9ce8a81bd4a92e809d016b72   (131072 bytes)
+    chunk header: 20000;chunk-signature=6f23ec73cdc567c5cb66b61e37999ec85212e614515471586dc74dee73f81787   (131072 bytes)
+    chunk header: 20000;chunk-signature=62219378cc6be1a90dcc8ab34b5467ace5a3b4bbf117d7ff025fe6a816f43069   (131072 bytes)
+    ... 5 more chunk headers ...
+    chunk header: 0;chunk-signature=4bfa4ab0036d7f6fb2d2bccd2251ebeec933dd9989dd20902e13f6e6c9c49334   (0 bytes)
+    trailer: x-amz-checksum-crc32:ZIRiNg==
+    trailer: x-amz-trailer-signature:8307cb66afeb119bb0c73cc41a811dacb06c2721d548069decf6ad7d1d8aea87
+    <empty line: end of trailers>
+  -- decoded payload: 1048576 bytes
+=== #8 POST /probe/sdk/multipart?uploadId=probe-upload
+  Amz-sdk-invocation-id: c0b39dcc-6e53-8472-eba6-ead5a0d08a86
+  Amz-sdk-request: attempt=1; max=4
+  Authorization: AWS4-HMAC-SHA256 Credential=probekey/20261008/us-east-1/s3/aws4_request, SignedHeaders=amz-sdk-invocation-id;amz-sdk-request;content-length;content-type;host;x-amz-content-sha256;x-amz-date, Signature=d8b1aa7d7c7741bb13eb876b32ea81df5d7f33274add0822374a07d77b09cc66
+  Connection: keep-alive
+  Content-length: 233
+  Content-type: application/xml
+  Host: localhost:9000
+  User-agent: aws-sdk-java/2.55.12 md/io#sync md/http#Apache5 ua/2.1 api/S3#2.55.x os/Mac_OS_X#26.5.2 lang/java#21.0.11 md/OpenJDK_64-Bit_Server_VM#21.0.11 md/vendor#Homebrew md/en_SG m/D,AJ,N,N,Z,b,e
+  X-amz-content-sha256: 98b999fde425a3f23c82cab116b79588cc723abfcbb0371ab35aae19975045de
+  X-amz-date: 20261008T133146Z
+  -- body: 233 bytes on the wire
+  <?xml version="1.0" encoding="UTF-8"?><CompleteMultipartUpload xmlns="http://s3.amazonaws.com/doc/2006-03-01/"><Part><ETag>&quot;0ac3d319bc785145344d87d20a6c6f6d&quot;</ETag><PartNumber>1</PartNumber></Part></CompleteMultipartUpload>

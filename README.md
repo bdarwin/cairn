@@ -7,6 +7,6 @@ upload, SigV4 and presigned URLs, written so a crash never leaves a torn object.
 that unmodified clients - the AWS SDK, the `aws` CLI, `mc` and DuckDB - work against it without
 noticing.
 
-Status: just started. Nothing here works yet.
+Status: just started. Nothing serves requests yet; the probes that decided the design are in `docs/probes.md`.
 
 Java 21. Apache 2.0.

@@ -1,0 +1,150 @@
+=== #1 GET /probe/?location=
+  Accept-encoding: zstd,gzip
+  Authorization: AWS4-HMAC-SHA256 Credential=probekey/20261008/us-east-1/s3/aws4_request, SignedHeaders=host;x-amz-content-sha256;x-amz-date, Signature=5eda9febeddc73c75a75ffe52b5612004bb00dfe335d695da56df64d2cd8211f
+  Host: localhost:9000
+  User-agent: MinIO (darwin; arm64) minio-go/v7.0.90 mc/RELEASE.2025-08-13T08-35-41Z
+  X-amz-content-sha256: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+  X-amz-date: 20261008T133154Z
+=== #2 GET /probe/?object-lock=
+  Accept-encoding: zstd,gzip
+  Authorization: AWS4-HMAC-SHA256 Credential=probekey/20261008/us-east-1/s3/aws4_request, SignedHeaders=host;x-amz-content-sha256;x-amz-date, Signature=c27b90bf4cff3fd2e9a909e8971ce823efb83e8537b9d3261a7ef98984f5e771
+  Host: localhost:9000
+  User-agent: MinIO (darwin; arm64) minio-go/v7.0.90 mc/RELEASE.2025-08-13T08-35-41Z
+  X-amz-content-sha256: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+  X-amz-date: 20261008T133154Z
+=== #3 HEAD /probe/mc/small.bin
+  Authorization: AWS4-HMAC-SHA256 Credential=probekey/20261008/us-east-1/s3/aws4_request, SignedHeaders=host;x-amz-checksum-mode;x-amz-content-sha256;x-amz-date, Signature=072383a2b450d13965088787cd303478209b618299036b27d8f6ebd70e296a59
+  Host: localhost:9000
+  User-agent: MinIO (darwin; arm64) minio-go/v7.0.90 mc/RELEASE.2025-08-13T08-35-41Z
+  X-amz-checksum-mode: ENABLED
+  X-amz-content-sha256: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+  X-amz-date: 20261008T133154Z
+=== #4 GET /probe/?delimiter=%2F&encoding-type=url&fetch-owner=true&list-type=2&max-keys=1&prefix=mc%2Fsmall.bin%2F
+  Accept-encoding: zstd,gzip
+  Authorization: AWS4-HMAC-SHA256 Credential=probekey/20261008/us-east-1/s3/aws4_request, SignedHeaders=host;x-amz-content-sha256;x-amz-date, Signature=05b014dd42d1a4f4dc9c81f8523519bb987827a734e363626b38d87171762cf8
+  Host: localhost:9000
+  User-agent: MinIO (darwin; arm64) minio-go/v7.0.90 mc/RELEASE.2025-08-13T08-35-41Z
+  X-amz-content-sha256: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+  X-amz-date: 20261008T133154Z
+=== #5 PUT /probe/mc/small.bin
+  Accept-encoding: zstd,gzip
+  Authorization: AWS4-HMAC-SHA256 Credential=probekey/20261008/us-east-1/s3/aws4_request,SignedHeaders=host;x-amz-content-sha256;x-amz-date;x-amz-decoded-content-length,Signature=aeafdae3a16f3bd2f8d46246c2c54a3755b6c05190f3d9df2853d8bbd838ab0d
+  Content-length: 10415
+  Content-type: application/octet-stream
+  Host: localhost:9000
+  User-agent: MinIO (darwin; arm64) minio-go/v7.0.90 mc/RELEASE.2025-08-13T08-35-41Z
+  X-amz-content-sha256: STREAMING-AWS4-HMAC-SHA256-PAYLOAD
+  X-amz-date: 20261008T133154Z
+  X-amz-decoded-content-length: 10240
+  -- body: 10415 bytes on the wire
+    chunk header: 2800;chunk-signature=b27665efa5061d93da01632756dbe1ec5c1d8622f6349fcf7ed07464b9402fd1   (10240 bytes)
+    chunk header: 0;chunk-signature=5f6e4b1da3264e3cc8f88b48312451cd91bcbed8a74c7495f03c05d5e99413db   (0 bytes)
+    <empty line: end of trailers>
+  -- decoded payload: 10240 bytes
+=== #6 GET /probe/?location=
+  Accept-encoding: zstd,gzip
+  Authorization: AWS4-HMAC-SHA256 Credential=probekey/20261008/us-east-1/s3/aws4_request, SignedHeaders=host;x-amz-content-sha256;x-amz-date, Signature=5eda9febeddc73c75a75ffe52b5612004bb00dfe335d695da56df64d2cd8211f
+  Host: localhost:9000
+  User-agent: MinIO (darwin; arm64) minio-go/v7.0.90 mc/RELEASE.2025-08-13T08-35-41Z
+  X-amz-content-sha256: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+  X-amz-date: 20261008T133154Z
+=== #7 GET /probe/?object-lock=
+  Accept-encoding: zstd,gzip
+  Authorization: AWS4-HMAC-SHA256 Credential=probekey/20261008/us-east-1/s3/aws4_request, SignedHeaders=host;x-amz-content-sha256;x-amz-date, Signature=c27b90bf4cff3fd2e9a909e8971ce823efb83e8537b9d3261a7ef98984f5e771
+  Host: localhost:9000
+  User-agent: MinIO (darwin; arm64) minio-go/v7.0.90 mc/RELEASE.2025-08-13T08-35-41Z
+  X-amz-content-sha256: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+  X-amz-date: 20261008T133154Z
+=== #8 HEAD /probe/mc/big20m.bin
+  Authorization: AWS4-HMAC-SHA256 Credential=probekey/20261008/us-east-1/s3/aws4_request, SignedHeaders=host;x-amz-checksum-mode;x-amz-content-sha256;x-amz-date, Signature=a6ab44fc522811a8e6c88fee154f4d48334cb0e52bbad391e872e21b0e9148a2
+  Host: localhost:9000
+  User-agent: MinIO (darwin; arm64) minio-go/v7.0.90 mc/RELEASE.2025-08-13T08-35-41Z
+  X-amz-checksum-mode: ENABLED
+  X-amz-content-sha256: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+  X-amz-date: 20261008T133154Z
+=== #9 GET /probe/?delimiter=%2F&encoding-type=url&fetch-owner=true&list-type=2&max-keys=1&prefix=mc%2Fbig20m.bin%2F
+  Accept-encoding: zstd,gzip
+  Authorization: AWS4-HMAC-SHA256 Credential=probekey/20261008/us-east-1/s3/aws4_request, SignedHeaders=host;x-amz-content-sha256;x-amz-date, Signature=a6aacb72e299f100a217294d9b2b70aeaf1f51dac40406e18052b3dc06f9074c
+  Host: localhost:9000
+  User-agent: MinIO (darwin; arm64) minio-go/v7.0.90 mc/RELEASE.2025-08-13T08-35-41Z
+  X-amz-content-sha256: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+  X-amz-date: 20261008T133154Z
+=== #10 POST /probe/mc/big20m.bin?uploads=
+  Accept-encoding: zstd,gzip
+  Authorization: AWS4-HMAC-SHA256 Credential=probekey/20261008/us-east-1/s3/aws4_request, SignedHeaders=content-type;host;x-amz-content-sha256;x-amz-date, Signature=df0cdd8fa8dce779a142b0e2756cf377fd3b475c5054f3fcbc2d83cd86b6bd03
+  Content-length: 0
+  Content-type: application/octet-stream
+  Host: localhost:9000
+  User-agent: MinIO (darwin; arm64) minio-go/v7.0.90 mc/RELEASE.2025-08-13T08-35-41Z
+  X-amz-content-sha256: UNSIGNED-PAYLOAD
+  X-amz-date: 20261008T133154Z
+=== #11 PUT /probe/mc/big20m.bin?partNumber=2&uploadId=probe-upload
+  Accept-encoding: zstd,gzip
+  Authorization: AWS4-HMAC-SHA256 Credential=probekey/20261008/us-east-1/s3/aws4_request,SignedHeaders=host;x-amz-content-sha256;x-amz-date;x-amz-decoded-content-length,Signature=f092411740af0462a8fa2750f934aeaebfd8e4b6b7043710c14626e9e73d0217
+  Content-length: 4200150
+  Host: localhost:9000
+  User-agent: MinIO (darwin; arm64) minio-go/v7.0.90 mc/RELEASE.2025-08-13T08-35-41Z
+  X-amz-content-sha256: STREAMING-AWS4-HMAC-SHA256-PAYLOAD
+  X-amz-date: 20261008T133154Z
+  X-amz-decoded-content-length: 4194304
+  -- body: 4200150 bytes on the wire
+    chunk header: 10000;chunk-signature=7e83c1cf5f5868fcf2fcfef0e77287b5c019bd96f4f73d6e6d12611066757188   (65536 bytes)
+    chunk header: 10000;chunk-signature=376b7ff574e6480056881c2cad75dca63d7ef272cc39f837a535eb93ac46f680   (65536 bytes)
+    chunk header: 10000;chunk-signature=e07a1bd9f9690038a70c3ffb39897eea710b23d5597305e045335f676a083bc7   (65536 bytes)
+    ... 59 more chunk headers ...
+    chunk header: 10000;chunk-signature=24059af1b735f9a8f428684e0c0be2d55799f9bafa9df102e34eb9df58172183   (65536 bytes)
+    chunk header: 10000;chunk-signature=ab52207c5737b9ef88cb03d90438a7aed2ac90daac1f49745148f1f5b73c962d   (65536 bytes)
+    chunk header: 0;chunk-signature=fb0bfce966d2ad888cc86f8a2bbc7bd0f1a1a3c679b66e94da4ba8ec1b7dace8   (0 bytes)
+    <empty line: end of trailers>
+  -- decoded payload: 4194304 bytes
+=== #12 PUT /probe/mc/big20m.bin?partNumber=1&uploadId=probe-upload
+  Accept-encoding: zstd,gzip
+  Authorization: AWS4-HMAC-SHA256 Credential=probekey/20261008/us-east-1/s3/aws4_request,SignedHeaders=host;x-amz-content-sha256;x-amz-date;x-amz-decoded-content-length,Signature=026c95fbf1cb97f66230d37e34901c8b3670bd686582d448f8c999605bc0c80a
+  Content-length: 16800342
+  Host: localhost:9000
+  User-agent: MinIO (darwin; arm64) minio-go/v7.0.90 mc/RELEASE.2025-08-13T08-35-41Z
+  X-amz-content-sha256: STREAMING-AWS4-HMAC-SHA256-PAYLOAD
+  X-amz-date: 20261008T133154Z
+  X-amz-decoded-content-length: 16777216
+  -- body: 16800342 bytes on the wire
+    chunk header: 10000;chunk-signature=8c5faba39ec427a93702622020e9fa93b3d9ff25966b8ad6633f67f2524f1dc4   (65536 bytes)
+    chunk header: 10000;chunk-signature=084027dd68557e25db6f06b9cc268ddb34bd9c2f105f0a70dd07d51569b4c000   (65536 bytes)
+    chunk header: 10000;chunk-signature=1d0f6850f29d158f88199974133bf068a5c5852f11e4747e9ad5cd0df3604793   (65536 bytes)
+    ... 251 more chunk headers ...
+    chunk header: 10000;chunk-signature=61b71eed89dff50601a0a59154322b1e234b0ff36efdcd9a7323b13240c2b9c1   (65536 bytes)
+    chunk header: 10000;chunk-signature=9591cb2a0e8ab3341355bf677bf98331fbd9d5a148e206854f2792bded292692   (65536 bytes)
+    chunk header: 0;chunk-signature=783248bf469ac9712f0dcdc07ede4df9cc76b27d793caa664f586c7e59dacff2   (0 bytes)
+    <empty line: end of trailers>
+  -- decoded payload: 16777216 bytes
+=== #13 POST /probe/mc/big20m.bin?uploadId=probe-upload
+  Accept-encoding: zstd,gzip
+  Authorization: AWS4-HMAC-SHA256 Credential=probekey/20261008/us-east-1/s3/aws4_request, SignedHeaders=content-type;host;x-amz-content-sha256;x-amz-date, Signature=e7c64a9a2357ad38c383f0424beb88e4fba5c5cd439cb5388b8a3711fec447e9
+  Content-length: 267
+  Content-type: application/octet-stream
+  Host: localhost:9000
+  User-agent: MinIO (darwin; arm64) minio-go/v7.0.90 mc/RELEASE.2025-08-13T08-35-41Z
+  X-amz-content-sha256: ec9f28d652d022b55a47e57e3dc30eb6f3d575f8de7fbd516b9dae8d3efd8068
+  X-amz-date: 20261008T133154Z
+  -- body: 267 bytes on the wire
+  <CompleteMultipartUpload xmlns="http://s3.amazonaws.com/doc/2006-03-01/"><Part><PartNumber>1</PartNumber><ETag>32476c557f536b233e1ff0fc31572c2a</ETag></Part><Part><PartNumber>2</PartNumber><ETag>1438bb26153d5d3f1a5a30c85400a1cd</ETag></Part></CompleteMultipartUpload>
+=== #14 GET /probe/?location=
+  Accept-encoding: zstd,gzip
+  Authorization: AWS4-HMAC-SHA256 Credential=probekey/20261008/us-east-1/s3/aws4_request, SignedHeaders=host;x-amz-content-sha256;x-amz-date, Signature=5eda9febeddc73c75a75ffe52b5612004bb00dfe335d695da56df64d2cd8211f
+  Host: localhost:9000
+  User-agent: MinIO (darwin; arm64) minio-go/v7.0.90 mc/RELEASE.2025-08-13T08-35-41Z
+  X-amz-content-sha256: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+  X-amz-date: 20261008T133154Z
+=== #15 HEAD /probe/mc/small.bin
+  Authorization: AWS4-HMAC-SHA256 Credential=probekey/20261008/us-east-1/s3/aws4_request, SignedHeaders=host;x-amz-checksum-mode;x-amz-content-sha256;x-amz-date, Signature=072383a2b450d13965088787cd303478209b618299036b27d8f6ebd70e296a59
+  Host: localhost:9000
+  User-agent: MinIO (darwin; arm64) minio-go/v7.0.90 mc/RELEASE.2025-08-13T08-35-41Z
+  X-amz-checksum-mode: ENABLED
+  X-amz-content-sha256: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+  X-amz-date: 20261008T133154Z
+=== #16 GET /probe/mc/small.bin
+  Accept-encoding: identity
+  Authorization: AWS4-HMAC-SHA256 Credential=probekey/20261008/us-east-1/s3/aws4_request, SignedHeaders=host;x-amz-content-sha256;x-amz-date, Signature=a64dd1dc68f4ed0bf2e47a5980c0e414970e8ad76716c77cc7e165942267c52d
+  Host: localhost:9000
+  User-agent: MinIO (darwin; arm64) minio-go/v7.0.90 mc/RELEASE.2025-08-13T08-35-41Z
+  X-amz-content-sha256: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+  X-amz-date: 20261008T133154Z

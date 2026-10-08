@@ -1,0 +1,115 @@
+=== #1 PUT /probe/cli/small.bin
+  Accept-encoding: identity
+  Amz-sdk-invocation-id: 1a76c1e5-590a-40e1-b132-7f2d9e58e7dc
+  Amz-sdk-request: attempt=1
+  Authorization: AWS4-HMAC-SHA256 Credential=probekey/20261008/us-east-1/s3/aws4_request, SignedHeaders=content-type;host;x-amz-checksum-crc64nvme;x-amz-content-sha256;x-amz-date;x-amz-sdk-checksum-algorithm, Signature=a16ced9e43f187ea37ef101afbf44e1ca0492a0dbadb9bbfc71ac77013d336bd
+  Content-length: 10240
+  Content-type: application/octet-stream
+  Expect: 100-continue
+  Host: localhost:9000
+  User-agent: aws-cli/2.37.10 md/awscrt#0.37.0 ua/2.1 os/macos#25.5.0 md/arch#arm64 lang/python#3.14.8 md/pyimpl#CPython m/Af,b,G,Z,N,AN,E,W cfg/retry-mode#standard md/installer#source sid/e9bf271eb91f md/prompt#off md/command#s3.cp
+  X-amz-checksum-crc64nvme: Eow3fxDpwds=
+  X-amz-content-sha256: 1252edee48d5715fed3d25c963af2429f8c2756fe634000de4fa5266b50c297c
+  X-amz-date: 20261008T133150Z
+  X-amz-sdk-checksum-algorithm: CRC64NVME
+  -- body: 10240 bytes on the wire
+=== #2 PUT /probe/cli/api-small.bin
+  Accept-encoding: identity
+  Amz-sdk-invocation-id: 49027bab-803f-4d79-a689-aec17f58828b
+  Amz-sdk-request: attempt=1
+  Authorization: AWS4-HMAC-SHA256 Credential=probekey/20261008/us-east-1/s3/aws4_request, SignedHeaders=host;x-amz-checksum-crc64nvme;x-amz-content-sha256;x-amz-date;x-amz-sdk-checksum-algorithm, Signature=57d3bd1b2fbc61ab0595f7913ee3ce972371f1110aa30b01669e7e7c6bb1e766
+  Content-length: 10240
+  Expect: 100-continue
+  Host: localhost:9000
+  User-agent: aws-cli/2.37.10 md/awscrt#0.37.0 ua/2.1 os/macos#25.5.0 md/arch#arm64 lang/python#3.14.8 md/pyimpl#CPython m/g,E,N,W,AN,Z,b cfg/retry-mode#standard md/installer#source sid/e9bf271eb91f md/prompt#off md/command#s3api.put-object
+  X-amz-checksum-crc64nvme: Eow3fxDpwds=
+  X-amz-content-sha256: 1252edee48d5715fed3d25c963af2429f8c2756fe634000de4fa5266b50c297c
+  X-amz-date: 20261008T133150Z
+  X-amz-sdk-checksum-algorithm: CRC64NVME
+  -- body: 10240 bytes on the wire
+=== #3 POST /probe/cli/big20m.bin?uploads
+  Accept-encoding: identity
+  Amz-sdk-invocation-id: b6b68346-1ad5-4efd-8c37-c4441075fb66
+  Amz-sdk-request: attempt=1
+  Authorization: AWS4-HMAC-SHA256 Credential=probekey/20261008/us-east-1/s3/aws4_request, SignedHeaders=content-type;host;x-amz-checksum-algorithm;x-amz-content-sha256;x-amz-date, Signature=63ea0a8bea6a63f2bba0e15473e4ac13d3b7593cd3a19379394f75f2d7420de5
+  Content-length: 0
+  Content-type: application/octet-stream
+  Host: localhost:9000
+  User-agent: aws-cli/2.37.10 md/awscrt#0.37.0 ua/2.1 os/macos#25.5.0 md/arch#arm64 lang/python#3.14.8 md/pyimpl#CPython m/Z,N,Af,E,b,AN,G cfg/retry-mode#standard md/installer#source sid/e9bf271eb91f md/prompt#off md/command#s3.cp
+  X-amz-checksum-algorithm: CRC64NVME
+  X-amz-content-sha256: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+  X-amz-date: 20261008T133150Z
+=== #4 PUT /probe/cli/big20m.bin?uploadId=probe-upload&partNumber=3
+  Accept-encoding: identity
+  Amz-sdk-invocation-id: 81abe7b6-1f1c-477e-bc4e-aceaffbf9fd4
+  Amz-sdk-request: attempt=1
+  Authorization: AWS4-HMAC-SHA256 Credential=probekey/20261008/us-east-1/s3/aws4_request, SignedHeaders=host;x-amz-checksum-crc64nvme;x-amz-content-sha256;x-amz-date;x-amz-sdk-checksum-algorithm, Signature=31d4ebcf3b348ac05a761b710a4ee2f9fe98ac1c0880582e8d69fb073e612d88
+  Content-length: 4194304
+  Expect: 100-continue
+  Host: localhost:9000
+  User-agent: aws-cli/2.37.10 md/awscrt#0.37.0 ua/2.1 os/macos#25.5.0 md/arch#arm64 lang/python#3.14.8 md/pyimpl#CPython m/Z,N,Af,E,b,AN,G,W cfg/retry-mode#standard md/installer#source sid/e9bf271eb91f md/prompt#off md/command#s3.cp
+  X-amz-checksum-crc64nvme: p3ZEXO6HIAY=
+  X-amz-content-sha256: 294b0f5b5653b254f5f99464be93bd9f320a4215b1e4ddd6e7e71526148f5ff1
+  X-amz-date: 20261008T133150Z
+  X-amz-sdk-checksum-algorithm: CRC64NVME
+  -- body: 4194304 bytes on the wire
+=== #5 PUT /probe/cli/big20m.bin?uploadId=probe-upload&partNumber=1
+  Accept-encoding: identity
+  Amz-sdk-invocation-id: a74a913c-e561-4cb1-95c8-5b5f6cbce7b6
+  Amz-sdk-request: attempt=1
+  Authorization: AWS4-HMAC-SHA256 Credential=probekey/20261008/us-east-1/s3/aws4_request, SignedHeaders=host;x-amz-checksum-crc64nvme;x-amz-content-sha256;x-amz-date;x-amz-sdk-checksum-algorithm, Signature=a4873a14332b1dc9dd3d9861a2ce6cf82145e833a9face415737269d5a75baad
+  Content-length: 8388608
+  Expect: 100-continue
+  Host: localhost:9000
+  User-agent: aws-cli/2.37.10 md/awscrt#0.37.0 ua/2.1 os/macos#25.5.0 md/arch#arm64 lang/python#3.14.8 md/pyimpl#CPython m/Z,N,Af,E,b,AN,G,W cfg/retry-mode#standard md/installer#source sid/e9bf271eb91f md/prompt#off md/command#s3.cp
+  X-amz-checksum-crc64nvme: kYJ4frk2e3I=
+  X-amz-content-sha256: 357e9edd0503ab9cc542420805ea1b8341d2921de0a79a6ff3024639f5e256e0
+  X-amz-date: 20261008T133150Z
+  X-amz-sdk-checksum-algorithm: CRC64NVME
+  -- body: 8388608 bytes on the wire
+=== #6 PUT /probe/cli/big20m.bin?uploadId=probe-upload&partNumber=2
+  Accept-encoding: identity
+  Amz-sdk-invocation-id: 69f4803f-5826-47b5-abe3-188a75d53658
+  Amz-sdk-request: attempt=1
+  Authorization: AWS4-HMAC-SHA256 Credential=probekey/20261008/us-east-1/s3/aws4_request, SignedHeaders=host;x-amz-checksum-crc64nvme;x-amz-content-sha256;x-amz-date;x-amz-sdk-checksum-algorithm, Signature=f062829976a02268d06f6bd209c48b17d86d32adc86120c4b48ed50ea27aa532
+  Content-length: 8388608
+  Expect: 100-continue
+  Host: localhost:9000
+  User-agent: aws-cli/2.37.10 md/awscrt#0.37.0 ua/2.1 os/macos#25.5.0 md/arch#arm64 lang/python#3.14.8 md/pyimpl#CPython m/Z,N,Af,E,b,AN,G,W cfg/retry-mode#standard md/installer#source sid/e9bf271eb91f md/prompt#off md/command#s3.cp
+  X-amz-checksum-crc64nvme: bkf83Q6nqxg=
+  X-amz-content-sha256: c0b5396eafe03223247ae34697b899e97ff8fa93d05ec0dbd760029246bbcc49
+  X-amz-date: 20261008T133150Z
+  X-amz-sdk-checksum-algorithm: CRC64NVME
+  -- body: 8388608 bytes on the wire
+=== #7 POST /probe/cli/big20m.bin?uploadId=probe-upload
+  Accept-encoding: identity
+  Amz-sdk-invocation-id: a056922e-fa73-44a6-8a13-ce99bc0e94a1
+  Amz-sdk-request: attempt=1
+  Authorization: AWS4-HMAC-SHA256 Credential=probekey/20261008/us-east-1/s3/aws4_request, SignedHeaders=host;x-amz-content-sha256;x-amz-date, Signature=78d6f05e1d0680120b8543e3c4c85cb8d74da7154b81277553a519b588daba35
+  Content-length: 357
+  Host: localhost:9000
+  User-agent: aws-cli/2.37.10 md/awscrt#0.37.0 ua/2.1 os/macos#25.5.0 md/arch#arm64 lang/python#3.14.8 md/pyimpl#CPython m/Z,N,Af,E,b,AN,G cfg/retry-mode#standard md/installer#source sid/e9bf271eb91f md/prompt#off md/command#s3.cp
+  X-amz-content-sha256: 9dc075abd12aab1aad84b2ef768c2ba643c733beb858419cbd9acc83776ae696
+  X-amz-date: 20261008T133150Z
+  -- body: 357 bytes on the wire
+  <CompleteMultipartUpload xmlns="http://s3.amazonaws.com/doc/2006-03-01/"><Part><ETag>"f3b145d8dfdecd28ae0b66e7ee0c1623"</ETag><PartNumber>1</PartNumber></Part><Part><ETag>"8d225e3ef271cc7e52f9ceb69933e0fd"</ETag><PartNumber>2</PartNumber></Part><Part><ETag>"1438bb26153d5d3f1a5a30c85400a1cd"</ETag><PartNumber>3</PartNumber></Part></CompleteMultipartUpload>
+=== #8 HEAD /probe/cli/small.bin
+  Accept-encoding: identity
+  Amz-sdk-invocation-id: 0e6fc823-70c5-4d7a-8429-765bd968d408
+  Amz-sdk-request: attempt=1
+  Authorization: AWS4-HMAC-SHA256 Credential=probekey/20261008/us-east-1/s3/aws4_request, SignedHeaders=host;x-amz-checksum-mode;x-amz-content-sha256;x-amz-date, Signature=b44d218eabb05d33efeb81c3b8326d3ec27bb7c87285e9a6c6de4a1c7ec7943e
+  Host: localhost:9000
+  User-agent: aws-cli/2.37.10 md/awscrt#0.37.0 ua/2.1 os/macos#25.5.0 md/arch#arm64 lang/python#3.14.8 md/pyimpl#CPython m/E,AN,Z,G,b,Af,N cfg/retry-mode#standard md/installer#source sid/e9bf271eb91f md/prompt#off md/command#s3.cp
+  X-amz-checksum-mode: ENABLED
+  X-amz-content-sha256: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+  X-amz-date: 20261008T133151Z
+=== #9 GET /probe/cli/small.bin
+  Accept-encoding: identity
+  Amz-sdk-invocation-id: eccc97ca-b8bd-40af-abd2-ae132461f271
+  Amz-sdk-request: attempt=1
+  Authorization: AWS4-HMAC-SHA256 Credential=probekey/20261008/us-east-1/s3/aws4_request, SignedHeaders=host;x-amz-checksum-mode;x-amz-content-sha256;x-amz-date, Signature=8c787ca061e0c667bd63ff42543409516a1e52ec0016b59ea6a601f3ab1b53e1
+  Host: localhost:9000
+  User-agent: aws-cli/2.37.10 md/awscrt#0.37.0 ua/2.1 os/macos#25.5.0 md/arch#arm64 lang/python#3.14.8 md/pyimpl#CPython m/E,AN,Z,G,b,Af,N cfg/retry-mode#standard md/installer#source sid/e9bf271eb91f md/prompt#off md/command#s3.cp
+  X-amz-checksum-mode: ENABLED
+  X-amz-content-sha256: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+  X-amz-date: 20261008T133151Z
