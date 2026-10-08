@@ -34,6 +34,9 @@ public interface ObjectStore extends AutoCloseable {
     /** The object's metadata, or null. */
     ObjectInfo head(String bucket, String key) throws IOException;
 
+    /** A page of the bucket's keys in UTF-8 order, rolled up by the delimiter if there is one. */
+    ListPage list(String bucket, ListQuery query) throws IOException;
+
     /** Deletes the object; false if there was none. */
     boolean delete(String bucket, String key) throws IOException;
 

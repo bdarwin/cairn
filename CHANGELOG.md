@@ -15,6 +15,9 @@
   with small objects inline. Writes commit with a rename. `CrashTest` kills the server mid-write
   and at each step of the commit.
 - `CairnServer` (embedding) and `Main` (command line).
+- ListObjectsV2 and ListObjects: prefix, delimiter, max-keys, continuation token, start-after,
+  marker, `encoding-type=url`, in UTF-8 key order. Large directories keep their sorted entries in
+  memory, keyed by modification time; measured on 1,000,000 keys in `docs/listing.md`.
 
 - Maven project (`io.github.bdarwin:cairn`, Java 21, no runtime dependencies).
 - Probes 1-5 with their measured results in `docs/probes.md`: `Expect: 100-continue` in the JDK

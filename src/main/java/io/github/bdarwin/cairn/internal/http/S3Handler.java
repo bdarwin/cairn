@@ -11,6 +11,8 @@ import io.github.bdarwin.cairn.internal.auth.AwsChunkedInputStream;
 import io.github.bdarwin.cairn.internal.auth.SignedRequest;
 import io.github.bdarwin.cairn.internal.checksum.ChecksumAlgorithm;
 import io.github.bdarwin.cairn.internal.store.BucketInfo;
+import io.github.bdarwin.cairn.internal.store.ListPage;
+import io.github.bdarwin.cairn.internal.store.ListQuery;
 import io.github.bdarwin.cairn.internal.store.NewObject;
 import io.github.bdarwin.cairn.internal.store.ObjectInfo;
 import io.github.bdarwin.cairn.internal.store.ObjectStore;
@@ -132,7 +134,8 @@ public final class S3Handler implements HttpHandler {
                     sendXml(ex, 200, "<VersioningConfiguration xmlns=\"" + Xml.NS + "\"/>");
                 } else {
                     refuseSubresources(r);
-                    throw S3Exception.notImplemented("listing objects");
+                    if ("2".equals(r.param("list-type"))) listObjectsV2(r, ex);
+                    else listObjectsV1(r, ex);
                 }
             }
             default -> throw methodNotAllowed();
@@ -280,6 +283,139 @@ public final class S3Handler implements HttpHandler {
         for (String[] m : map) {
             String v = r.param(m[0]);
             if (v != null) h.set(m[1], v);
+        }
+    }
+
+    // ---- listing ----
+
+    private void listObjectsV2(Request r, HttpExchange ex) throws IOException {
+        String prefix = orEmpty(r.param("prefix"));
+        String delimiter = emptyToNull(r.param("delimiter"));
+        int maxKeys = maxKeys(r);
+        boolean url = encodingType(r);
+        String token = r.param("continuation-token");
+        String startAfter = emptyToNull(r.param("start-after"));
+        String after = startAfter;
+        boolean afterIsPrefix = false;
+        if (token != null) {
+            ContinuationToken t = ContinuationToken.decode(token);
+            // The token is past start-after already, unless start-after is further on.
+            if (startAfter == null || io.github.bdarwin.cairn.internal.store.Utf8Order.compare(t.after(), startAfter) >= 0) {
+                after = t.after();
+                afterIsPrefix = t.isPrefix();
+            }
+        }
+        ListPage page = store.list(r.bucket, new ListQuery(prefix, delimiter, after, afterIsPrefix, maxKeys));
+        StringBuilder sb = new StringBuilder("<ListBucketResult xmlns=\"" + Xml.NS + "\">");
+        Xml.element(sb, "Name", r.bucket);
+        Xml.element(sb, "Prefix", enc(prefix, url));
+        if (delimiter != null) Xml.element(sb, "Delimiter", enc(delimiter, url));
+        Xml.element(sb, "MaxKeys", maxKeys);
+        if (url) Xml.element(sb, "EncodingType", "url");
+        Xml.element(sb, "KeyCount", page.entries().size());
+        Xml.element(sb, "IsTruncated", page.truncated());
+        if (token != null) Xml.element(sb, "ContinuationToken", token);
+        if (page.truncated()) {
+            ListPage.Entry last = page.entries().getLast();
+            Xml.element(sb, "NextContinuationToken", new ContinuationToken(last.key(), last.isPrefix()).encode());
+        }
+        if (startAfter != null) Xml.element(sb, "StartAfter", enc(startAfter, url));
+        appendEntries(sb, page, url, "true".equals(r.param("fetch-owner")));
+        sb.append("</ListBucketResult>");
+        sendXml(ex, 200, sb.toString());
+    }
+
+    private void listObjectsV1(Request r, HttpExchange ex) throws IOException {
+        String prefix = orEmpty(r.param("prefix"));
+        String delimiter = emptyToNull(r.param("delimiter"));
+        int maxKeys = maxKeys(r);
+        boolean url = encodingType(r);
+        String marker = emptyToNull(r.param("marker"));
+        // A marker is a key or a common prefix from the previous page; skipping keys under it is right either way,
+        // because a key equal to a returned prefix cannot follow it.
+        boolean markerIsPrefix = marker != null && delimiter != null && marker.endsWith(delimiter);
+        ListPage page = store.list(r.bucket, new ListQuery(prefix, delimiter, marker, markerIsPrefix, maxKeys));
+        StringBuilder sb = new StringBuilder("<ListBucketResult xmlns=\"" + Xml.NS + "\">");
+        Xml.element(sb, "Name", r.bucket);
+        Xml.element(sb, "Prefix", enc(prefix, url));
+        Xml.element(sb, "Marker", enc(orEmpty(marker), url));
+        if (page.truncated() && delimiter != null) Xml.element(sb, "NextMarker", enc(page.entries().getLast().key(), url));
+        Xml.element(sb, "MaxKeys", maxKeys);
+        if (delimiter != null) Xml.element(sb, "Delimiter", enc(delimiter, url));
+        if (url) Xml.element(sb, "EncodingType", "url");
+        Xml.element(sb, "IsTruncated", page.truncated());
+        appendEntries(sb, page, url, true);
+        sb.append("</ListBucketResult>");
+        sendXml(ex, 200, sb.toString());
+    }
+
+    private static void appendEntries(StringBuilder sb, ListPage page, boolean url, boolean owner) {
+        for (ListPage.Entry e : page.entries()) {
+            if (e.isPrefix()) continue;
+            ObjectInfo o = e.object();
+            sb.append("<Contents>");
+            Xml.element(sb, "Key", enc(o.key(), url));
+            Xml.element(sb, "LastModified", HttpDates.iso(o.lastModified()));
+            Xml.element(sb, "ETag", quote(o.etag()));
+            Xml.element(sb, "Size", o.size());
+            if (owner) sb.append("<Owner><ID>cairn</ID><DisplayName>cairn</DisplayName></Owner>");
+            Xml.element(sb, "StorageClass", "STANDARD");
+            sb.append("</Contents>");
+        }
+        for (ListPage.Entry e : page.entries()) {
+            if (!e.isPrefix()) continue;
+            sb.append("<CommonPrefixes>");
+            Xml.element(sb, "Prefix", enc(e.key(), url));
+            sb.append("</CommonPrefixes>");
+        }
+    }
+
+    private static int maxKeys(Request r) {
+        String v = r.param("max-keys");
+        if (v == null) return 1000;
+        try {
+            int n = Integer.parseInt(v.trim());
+            if (n < 0) throw S3Exception.invalidArgument("max-keys cannot be negative");
+            return Math.min(n, 1000);
+        } catch (NumberFormatException e) {
+            throw S3Exception.invalidArgument("Provided max-keys not an integer or within integer range");
+        }
+    }
+
+    private static boolean encodingType(Request r) {
+        String v = r.param("encoding-type");
+        if (v == null) return false;
+        if (!v.equals("url")) throw S3Exception.invalidArgument("Invalid Encoding Method specified in Request");
+        return true;
+    }
+
+    /** With {@code encoding-type=url}, names are percent-encoded so any key survives XML 1.0. */
+    private static String enc(String s, boolean url) {
+        return url ? io.github.bdarwin.cairn.internal.auth.SigV4.uriEncode(s, false) : s;
+    }
+
+    private static String orEmpty(String s) {
+        return s == null ? "" : s;
+    }
+
+    private static String emptyToNull(String s) {
+        return s == null || s.isEmpty() ? null : s;
+    }
+
+    /** The opaque {@code NextContinuationToken}: the last key or common prefix returned. */
+    record ContinuationToken(String after, boolean isPrefix) {
+        String encode() {
+            return Base64.getUrlEncoder().withoutPadding().encodeToString(((isPrefix ? "p" : "k") + after).getBytes(StandardCharsets.UTF_8));
+        }
+
+        static ContinuationToken decode(String token) {
+            try {
+                String s = new String(Base64.getUrlDecoder().decode(token), StandardCharsets.UTF_8);
+                if (s.isEmpty() || (s.charAt(0) != 'p' && s.charAt(0) != 'k')) throw new IllegalArgumentException();
+                return new ContinuationToken(s.substring(1), s.charAt(0) == 'p');
+            } catch (IllegalArgumentException e) {
+                throw S3Exception.invalidArgument("The continuation token provided is incorrect");
+            }
         }
     }
 

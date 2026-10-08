@@ -74,6 +74,7 @@ public final class CairnServer implements AutoCloseable {
         private String region = "us-east-1";
         private final Map<String, String> credentials = new LinkedHashMap<>();
         private Clock clock = Clock.systemUTC();
+        private boolean durable = true;
 
         private Builder(Path dataDirectory) {
             this.dataDirectory = Objects.requireNonNull(dataDirectory);
@@ -108,9 +109,15 @@ public final class CairnServer implements AutoCloseable {
             return this;
         }
 
+        /** Tests only: skip forcing writes to disk. */
+        Builder durable(boolean durable) {
+            this.durable = durable;
+            return this;
+        }
+
         public CairnServer start() throws IOException {
             if (credentials.isEmpty()) throw new IllegalStateException("no credentials configured");
-            LocalObjectStore store = new LocalObjectStore(dataDirectory, clock);
+            LocalObjectStore store = new LocalObjectStore(dataDirectory, clock, durable);
             HttpServer http = HttpServer.create(new InetSocketAddress(bindAddress, port), 1024);
             ExecutorService executor = Executors.newVirtualThreadPerTaskExecutor();
             http.setExecutor(executor);

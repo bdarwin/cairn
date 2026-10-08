@@ -55,6 +55,16 @@ class AwsCliTest {
         assertTrue(head.contains("\"ContentLength\": " + data.length), head);
         assertTrue(head.contains("\"ChecksumCRC64NVME\""), "the CLI's CRC64NVME was verified and stored: " + head);
 
+        aws("s3", "cp", file.toString(), "s3://items/dir/sub/other.bin");
+        aws("s3", "cp", file.toString(), "s3://items/dir-x");
+        String ls = aws("s3", "ls", "s3://items/dir/");
+        assertTrue(ls.contains("PRE sub/") && ls.contains(data.length + " reading.bin"), ls);
+        String recursive = aws("s3", "ls", "--recursive", "s3://items");
+        List<String> listed = recursive.lines().map(l -> l.substring(l.lastIndexOf(' ') + 1)).toList();
+        assertEquals(List.of("dir-x", "dir/reading.bin", "dir/sub/other.bin"), listed, "'-' sorts before '/'");
+
+        aws("s3", "rm", "s3://items/dir-x");
+        aws("s3", "rm", "s3://items/dir/sub/other.bin");
         aws("s3", "rm", "s3://items/dir/reading.bin");
         aws("s3", "rb", "s3://items");
     }

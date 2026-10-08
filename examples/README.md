@@ -28,3 +28,5 @@ three copies of the file.
 | Example | What it shows |
 |---|---|
 | `ObjectsEndToEnd` | PUT and GET at 1 KiB to 1 GiB through the AWS SDK, concurrent small PUTs, an `aws` CLI round trip |
+| `ListingMillion` | ListObjectsV2 over 1,000,000 keys, nested and flat, through the HTTP API |
+| `probes/ProbeDirectoryCost`, `probes/ProbeListingCost` | Where a listing page's time goes |

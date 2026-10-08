@@ -68,12 +68,28 @@ public final class LocalObjectStore implements ObjectStore {
 
     private final Path root;
     private final Clock clock;
+    private final boolean durable;
+    private final DirectoryIndex directoryIndex;
     private final ReentrantReadWriteLock[] bucketLocks = new ReentrantReadWriteLock[STRIPES];
     private final ReentrantLock[] objectLocks = new ReentrantLock[STRIPES];
 
     public LocalObjectStore(Path root, Clock clock) throws IOException {
+        this(root, clock, true);
+    }
+
+    /**
+     * @param durable false skips every force: writes still commit by rename and survive a process
+     *                crash, but not a power loss. For tests and bulk loading; the server is always durable.
+     */
+    public LocalObjectStore(Path root, Clock clock, boolean durable) throws IOException {
+        this(root, clock, durable, new DirectoryIndex());
+    }
+
+    LocalObjectStore(Path root, Clock clock, boolean durable, DirectoryIndex directoryIndex) throws IOException {
+        this.directoryIndex = directoryIndex;
         this.root = root.toAbsolutePath().normalize();
         this.clock = clock;
+        this.durable = durable;
         int rootLength = this.root.toString().getBytes(StandardCharsets.UTF_8).length;
         if (rootLength > MAX_ROOT) {
             throw new IllegalArgumentException("data directory path is " + rootLength + " bytes; at most " + MAX_ROOT
@@ -212,7 +228,7 @@ public final class LocalObjectStore implements ObjectStore {
                             size += r;
                         }
                         CrashPoints.reached(CrashPoints.DATA_WRITTEN);
-                        ch.force(true);
+                        force(ch);
                     }
                     CrashPoints.reached(CrashPoints.DATA_FORCED);
                 } catch (IOException | RuntimeException e) {
@@ -250,7 +266,7 @@ public final class LocalObjectStore implements ObjectStore {
         String tmpName = ".meta-" + UUID.randomUUID() + ".tmp";
         try (FileChannel ch = createFile(bucketDir, loc, tmpName)) {
             writeFully(ch, meta, meta.length);
-            ch.force(true);
+            force(ch);
         }
         CrashPoints.reached(CrashPoints.META_FORCED);
         Path tmp = dir.resolve(tmpName);
@@ -299,6 +315,19 @@ public final class LocalObjectStore implements ObjectStore {
         Path bucketDir = requireBucket(bucket);
         MetaFile.Contents c = readMeta(objectDir(bucketDir, KeyCodec.locate(key)));
         return c == null || !c.info().key().equals(key) ? null : c.info();
+    }
+
+    @Override
+    public ListPage list(String bucket, ListQuery query) throws IOException {
+        Path bucketDir = requireBucket(bucket);
+        ListingWalk walk = ListingWalk.start(directoryIndex, bucketDir, query);
+        List<ListPage.Entry> entries = new ArrayList<>(Math.min(query.maxKeys(), 1000));
+        while (entries.size() < query.maxKeys()) {
+            ListPage.Entry e = walk.next();
+            if (e == null) return new ListPage(entries, false);
+            entries.add(e);
+        }
+        return new ListPage(entries, walk.next() != null);
     }
 
     @Override
@@ -420,20 +449,25 @@ public final class LocalObjectStore implements ObjectStore {
     }
 
     /** Writes {@code name} in {@code dir} through a forced temporary file and a rename, then forces the directory. */
-    private static void writeDurably(Path dir, String name, byte[] bytes) throws IOException {
+    private void writeDurably(Path dir, String name, byte[] bytes) throws IOException {
         Path tmp = dir.resolve("." + name + "-" + UUID.randomUUID() + ".tmp");
         try (FileChannel ch = FileChannel.open(tmp, StandardOpenOption.CREATE_NEW, StandardOpenOption.WRITE)) {
             writeFully(ch, bytes, bytes.length);
-            ch.force(true);
+            force(ch);
         }
         Files.move(tmp, dir.resolve(name), StandardCopyOption.ATOMIC_MOVE, StandardCopyOption.REPLACE_EXISTING);
         force(dir);
     }
 
-    static void force(Path dir) throws IOException {
+    private void force(Path dir) throws IOException {
+        if (!durable) return;
         try (FileChannel d = FileChannel.open(dir, StandardOpenOption.READ)) {
             d.force(true);
         }
+    }
+
+    private void force(FileChannel ch) throws IOException {
+        if (durable) ch.force(true);
     }
 
     private static void writeFully(FileChannel ch, byte[] b, int n) throws IOException {

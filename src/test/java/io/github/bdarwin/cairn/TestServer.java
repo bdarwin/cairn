@@ -19,7 +19,12 @@ public final class TestServer implements AutoCloseable {
     public final CairnServer server;
 
     public TestServer(Path dataDir) throws IOException {
-        server = CairnServer.builder(dataDir).bindAddress("127.0.0.1").port(0).credentials(ACCESS_KEY, SECRET_KEY).start();
+        this(dataDir, true);
+    }
+
+    /** {@code durable} false skips forces: for tests that write thousands of objects and are not about durability. */
+    public TestServer(Path dataDir, boolean durable) throws IOException {
+        server = CairnServer.builder(dataDir).bindAddress("127.0.0.1").port(0).credentials(ACCESS_KEY, SECRET_KEY).durable(durable).start();
     }
 
     public URI endpoint() {

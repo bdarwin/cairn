@@ -23,6 +23,7 @@ nav:
   - Getting started: getting-started.md
   - Design:
       - Storage: storage.md
+      - Listing: listing.md
       - Probes: probes.md
 
 markdown_extensions:

@@ -12,4 +12,9 @@ Found and not done, worst first.
    it over HTTPS, and no real client was captured sending it, because cairn has no TLS.
 4. **A durable small PUT costs 20-30 ms on macOS** (three `F_FULLFSYNC`s for a new key). No option
    trades durability for speed.
-5. **Virtual-host-style addressing** (`bucket.host`) is not served; path style only.
+5. **A full listing reads every object's directory to look for keys below it** (about a third of a
+   listing's time under JFR, `ProbeListingCost`). Most objects have nothing below them; a cheaper
+   way to know would take listing from about 7,400 towards 10,000 keys a second.
+6. **Cold-cache listing is unmeasured** (macOS needs root to drop the file cache). The first listing
+   of a 1,000,000-entry directory after a restart took 7.7 s to build its index.
+7. **Virtual-host-style addressing** (`bucket.host`) is not served; path style only.

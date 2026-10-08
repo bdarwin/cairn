@@ -65,6 +65,7 @@ AWS_ACCESS_KEY_ID=example-key AWS_SECRET_ACCESS_KEY=example-secret AWS_DEFAULT_R
 |---|---|
 | Buckets | create, delete (empty only), head, list |
 | Objects | PUT, GET (with `Range`), HEAD, DELETE |
+| Listing | ListObjectsV2 and ListObjects: prefix, delimiter, max-keys, continuation token, start-after, marker, `encoding-type=url` |
 | Auth | SigV4 in the header; all three `aws-chunked` body forms |
 | Integrity | `Content-MD5`; `x-amz-checksum-*` CRC32, CRC32C, CRC64NVME, SHA-1, SHA-256, as headers or trailers |
-| Not yet | listing objects, multipart upload, presigned URLs, conditional requests, CopyObject, DeleteObjects |
+| Not yet | multipart upload, presigned URLs, conditional requests, CopyObject, DeleteObjects |

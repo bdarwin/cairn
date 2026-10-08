@@ -7,7 +7,7 @@ upload, SigV4 and presigned URLs, written so a crash never leaves a torn object.
 that unmodified clients - the AWS SDK, the `aws` CLI, `mc` and DuckDB - work against it without
 noticing.
 
-Status: buckets and single objects work end to end (PUT, GET with ranges, HEAD, DELETE, SigV4,
-checksums). Listing and multipart upload are next. Docs in `docs/`, found-and-not-done in `TODO.md`.
+Status: buckets, objects and listing work end to end (PUT, GET with ranges, HEAD, DELETE, ListObjectsV2,
+SigV4, checksums). Multipart upload is next. Docs in `docs/`, found-and-not-done in `TODO.md`.
 
 Java 21. Apache 2.0.
