@@ -175,6 +175,9 @@ class ObjectsSdkTest {
         s3.putObject(b -> b.bucket("items").key("k"), RequestBody.fromBytes(new byte[200_000]));
         s3.putObject(b -> b.bucket("items").key("k"), RequestBody.fromString("short now"));
         assertEquals("short now", s3.getObjectAsBytes(b -> b.bucket("items").key("k")).asUtf8String());
+        // Small over small: both inline (this once failed with a NullPointerException, found by CrashTest).
+        s3.putObject(b -> b.bucket("items").key("k"), RequestBody.fromString("shorter"));
+        assertEquals("shorter", s3.getObjectAsBytes(b -> b.bucket("items").key("k")).asUtf8String());
         try (var files = Files.walk(dir)) {
             assertEquals(0, files.filter(p -> p.getFileName().toString().startsWith(".data-")).count(), "old data file removed");
         }

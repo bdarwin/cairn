@@ -63,13 +63,14 @@ public final class LocalObjectStore implements ObjectStore {
 
     static final String META = ".meta";
     static final String BUCKET_META = ".bucket";
-    private static final int COPY_BUFFER = 1 << 20;
+    static final int COPY_BUFFER = 1 << 20;
     private static final int STRIPES = 1024;
 
     private final Path root;
-    private final Clock clock;
+    final Clock clock;
     private final boolean durable;
     private final DirectoryIndex directoryIndex;
+    private final LocalUploads uploads;
     private final ReentrantReadWriteLock[] bucketLocks = new ReentrantReadWriteLock[STRIPES];
     private final ReentrantLock[] objectLocks = new ReentrantLock[STRIPES];
 
@@ -90,6 +91,7 @@ public final class LocalObjectStore implements ObjectStore {
         this.root = root.toAbsolutePath().normalize();
         this.clock = clock;
         this.durable = durable;
+        this.uploads = new LocalUploads(this, this.root);
         int rootLength = this.root.toString().getBytes(StandardCharsets.UTF_8).length;
         if (rootLength > MAX_ROOT) {
             throw new IllegalArgumentException("data directory path is " + rootLength + " bytes; at most " + MAX_ROOT
@@ -160,6 +162,8 @@ public final class LocalObjectStore implements ObjectStore {
             force(dir);
             deleteTree(dir);
             force(root);
+            // Uploads in progress go with the bucket.
+            deleteTree(uploads.bucketUploads(bucket));
         } finally {
             lock.unlock();
         }
@@ -247,9 +251,10 @@ public final class LocalObjectStore implements ObjectStore {
             String crc32c = base64(crc.getValue());
             ObjectInfo info = new ObjectInfo(key, size, etag, Instant.ofEpochMilli(clock.millis()), attributes.contentType(),
                     Map.copyOf(attributes.userMetadata()), Map.copyOf(attributes.headers()), Map.copyOf(attributes.checksums()),
-                    List.of(new PartInfo(1, size, etag, crc32c)));
+                    List.of(new PartInfo(1, size, etag, crc32c, null)));
+            List<String> files = dataFile == null ? List.of() : List.of(dataFile);
             try {
-                commit(bucketDir, loc, MetaFile.encode(info, dataFile, inline), dataFile, key);
+                commit(bucketDir, loc, MetaFile.encode(info, files, inline), files, key);
             } catch (IOException | RuntimeException e) {
                 if (dataFile != null) Files.deleteIfExists(dir.resolve(dataFile));
                 throw e;
@@ -260,8 +265,11 @@ public final class LocalObjectStore implements ObjectStore {
         }
     }
 
-    /** Writes the new {@code .meta} beside the old one, then renames it into place under the object's lock. */
-    private void commit(Path bucketDir, KeyCodec.Location loc, byte[] meta, String dataFile, String key) throws IOException {
+    /**
+     * Writes the new {@code .meta} beside the old one, then renames it into place under the object's
+     * lock: the commit. Afterwards deletes the data files of the version it replaced.
+     */
+    void commit(Path bucketDir, KeyCodec.Location loc, byte[] meta, List<String> dataFiles, String key) throws IOException {
         Path dir = objectDir(bucketDir, loc);
         String tmpName = ".meta-" + UUID.randomUUID() + ".tmp";
         try (FileChannel ch = createFile(bucketDir, loc, tmpName)) {
@@ -281,8 +289,8 @@ public final class LocalObjectStore implements ObjectStore {
             Files.move(tmp, dir.resolve(META), StandardCopyOption.ATOMIC_MOVE, StandardCopyOption.REPLACE_EXISTING);
             CrashPoints.reached(CrashPoints.RENAMED);
             force(dir);
-            if (old != null && old.dataFile() != null && !old.dataFile().equals(dataFile)) {
-                Files.deleteIfExists(dir.resolve(old.dataFile()));
+            if (old != null) {
+                for (String f : old.dataFiles()) if (!dataFiles.contains(f)) Files.deleteIfExists(dir.resolve(f));
             }
         } catch (IOException | RuntimeException e) {
             Files.deleteIfExists(tmp);
@@ -301,10 +309,13 @@ public final class LocalObjectStore implements ObjectStore {
             MetaFile.Contents c = readMeta(dir);
             if (c == null || !c.info().key().equals(key)) return null;
             if (c.inline() != null) return new InlineObject(c.info(), c.inline());
+            List<FileChannel> channels = new ArrayList<>();
             try {
-                return new FileObject(c.info(), FileChannel.open(dir.resolve(c.dataFile()), StandardOpenOption.READ));
+                for (String f : c.dataFiles()) channels.add(FileChannel.open(dir.resolve(f), StandardOpenOption.READ));
+                return new FileObject(c.info(), channels);
             } catch (NoSuchFileException e) {
-                // Replaced between reading .meta and opening its data file: read .meta again.
+                // Replaced between reading .meta and opening its data files: read .meta again.
+                for (FileChannel ch : channels) ch.close();
             }
         }
         throw S3Exception.internal("object kept changing while being opened");
@@ -344,7 +355,7 @@ public final class LocalObjectStore implements ObjectStore {
                 if (c == null || !c.info().key().equals(key)) return false;
                 Files.delete(dir.resolve(META));
                 force(dir);
-                if (c.dataFile() != null) Files.deleteIfExists(dir.resolve(c.dataFile()));
+                for (String f : c.dataFiles()) Files.deleteIfExists(dir.resolve(f));
             } finally {
                 lock.unlock();
             }
@@ -355,9 +366,71 @@ public final class LocalObjectStore implements ObjectStore {
         }
     }
 
+    // ---- multipart uploads ----
+
+    @Override
+    public Upload createUpload(String bucket, String key, NewObject attributes, String checksumAlgorithm, String checksumType) throws IOException {
+        Lock lock = bucketLock(bucket).readLock();
+        lock.lock();
+        try {
+            return uploads.create(bucket, key, attributes, checksumAlgorithm, checksumType);
+        } finally {
+            lock.unlock();
+        }
+    }
+
+    @Override
+    public Upload upload(String bucket, String key, String uploadId) throws IOException {
+        return uploads.get(bucket, key, uploadId);
+    }
+
+    @Override
+    public PartInfo putPart(String bucket, String key, String uploadId, int partNumber, InputStream body, BeforeCommit check,
+                            Map<String, String> checksums) throws IOException {
+        Lock lock = bucketLock(bucket).readLock();
+        lock.lock();
+        try {
+            return uploads.putPart(bucket, key, uploadId, partNumber, body, check, checksums);
+        } finally {
+            lock.unlock();
+        }
+    }
+
+    @Override
+    public List<UploadedPart> parts(String bucket, String key, String uploadId) throws IOException {
+        return uploads.parts(bucket, key, uploadId);
+    }
+
+    @Override
+    public ObjectInfo completeUpload(String bucket, String key, String uploadId, List<CompletedPart> parts) throws IOException {
+        Lock lock = bucketLock(bucket).readLock();
+        lock.lock();
+        try {
+            return uploads.complete(bucket, key, uploadId, parts);
+        } finally {
+            lock.unlock();
+        }
+    }
+
+    @Override
+    public void abortUpload(String bucket, String key, String uploadId) throws IOException {
+        Lock lock = bucketLock(bucket).readLock();
+        lock.lock();
+        try {
+            uploads.abort(bucket, key, uploadId);
+        } finally {
+            lock.unlock();
+        }
+    }
+
+    @Override
+    public List<Upload> uploads(String bucket) throws IOException {
+        return uploads.list(bucket);
+    }
+
     // ---- helpers ----
 
-    private Path requireBucket(String bucket) {
+    Path requireBucket(String bucket) {
         Path dir = root.resolve(bucket);
         if (!Files.exists(dir.resolve(BUCKET_META))) throw S3Exception.noSuchBucket();
         return dir;
@@ -373,26 +446,9 @@ public final class LocalObjectStore implements ObjectStore {
      * Creates {@code name} in the object's directory, creating the directories on the way and forcing
      * each parent that gained an entry. Retries if a concurrent delete prunes a directory meanwhile.
      */
-    private FileChannel createFile(Path bucketDir, KeyCodec.Location loc, String name) throws IOException {
+    FileChannel createFile(Path bucketDir, KeyCodec.Location loc, String name) throws IOException {
         for (int attempt = 0; ; attempt++) {
-            Path dir = bucketDir;
-            List<String> names = new ArrayList<>(loc.directories());
-            names.add(loc.name());
-            for (String d : names) {
-                Path next = dir.resolve(d);
-                if (!Files.isDirectory(next)) {
-                    try {
-                        Files.createDirectory(next);
-                        force(dir);
-                    } catch (FileAlreadyExistsException e) {
-                        // created concurrently
-                    } catch (NoSuchFileException e) {
-                        if (attempt < 10) break;
-                        throw e;
-                    }
-                }
-                dir = next;
-            }
+            Path dir = ensureDirectories(bucketDir, loc);
             try {
                 return FileChannel.open(dir.resolve(name), StandardOpenOption.CREATE_NEW, StandardOpenOption.WRITE);
             } catch (NoSuchFileException e) {
@@ -401,7 +457,41 @@ public final class LocalObjectStore implements ObjectStore {
         }
     }
 
-    private static MetaFile.Contents readMeta(Path dir) throws IOException {
+    /** Hard-links {@code target} into the object's directory as {@code name}, creating directories as {@link #createFile} does. */
+    void linkFile(Path bucketDir, KeyCodec.Location loc, String name, Path target) throws IOException {
+        for (int attempt = 0; ; attempt++) {
+            Path dir = ensureDirectories(bucketDir, loc);
+            try {
+                Files.createLink(dir.resolve(name), target);
+                return;
+            } catch (NoSuchFileException e) {
+                if (attempt >= 10 || !Files.exists(target)) throw e;
+            }
+        }
+    }
+
+    private Path ensureDirectories(Path bucketDir, KeyCodec.Location loc) throws IOException {
+        Path dir = bucketDir;
+        List<String> names = new ArrayList<>(loc.directories());
+        names.add(loc.name());
+        for (String d : names) {
+            Path next = dir.resolve(d);
+            if (!Files.isDirectory(next)) {
+                try {
+                    Files.createDirectory(next);
+                    force(dir);
+                } catch (FileAlreadyExistsException e) {
+                    // created concurrently
+                } catch (NoSuchFileException e) {
+                    return next; // a parent was pruned meanwhile; the caller's retry starts again
+                }
+            }
+            dir = next;
+        }
+        return dir;
+    }
+
+    static MetaFile.Contents readMeta(Path dir) throws IOException {
         byte[] bytes;
         try {
             bytes = Files.readAllBytes(dir.resolve(META));
@@ -439,7 +529,7 @@ public final class LocalObjectStore implements ObjectStore {
         return false;
     }
 
-    private static void deleteTree(Path p) throws IOException {
+    static void deleteTree(Path p) throws IOException {
         if (Files.isDirectory(p, java.nio.file.LinkOption.NOFOLLOW_LINKS)) {
             try (DirectoryStream<Path> ds = Files.newDirectoryStream(p)) {
                 for (Path c : ds) deleteTree(c);
@@ -449,7 +539,7 @@ public final class LocalObjectStore implements ObjectStore {
     }
 
     /** Writes {@code name} in {@code dir} through a forced temporary file and a rename, then forces the directory. */
-    private void writeDurably(Path dir, String name, byte[] bytes) throws IOException {
+    void writeDurably(Path dir, String name, byte[] bytes) throws IOException {
         Path tmp = dir.resolve("." + name + "-" + UUID.randomUUID() + ".tmp");
         try (FileChannel ch = FileChannel.open(tmp, StandardOpenOption.CREATE_NEW, StandardOpenOption.WRITE)) {
             writeFully(ch, bytes, bytes.length);
@@ -459,23 +549,23 @@ public final class LocalObjectStore implements ObjectStore {
         force(dir);
     }
 
-    private void force(Path dir) throws IOException {
+    void force(Path dir) throws IOException {
         if (!durable) return;
         try (FileChannel d = FileChannel.open(dir, StandardOpenOption.READ)) {
             d.force(true);
         }
     }
 
-    private void force(FileChannel ch) throws IOException {
+    void force(FileChannel ch) throws IOException {
         if (durable) ch.force(true);
     }
 
-    private static void writeFully(FileChannel ch, byte[] b, int n) throws IOException {
+    static void writeFully(FileChannel ch, byte[] b, int n) throws IOException {
         ByteBuffer buf = ByteBuffer.wrap(b, 0, n);
         while (buf.hasRemaining()) ch.write(buf);
     }
 
-    private static MessageDigest md5() {
+    static MessageDigest md5() {
         try {
             return MessageDigest.getInstance("MD5");
         } catch (NoSuchAlgorithmException e) {
@@ -487,11 +577,11 @@ public final class LocalObjectStore implements ObjectStore {
         return Base64.getEncoder().encodeToString(ByteBuffer.allocate(4).putInt((int) crc32).array());
     }
 
-    private ReentrantReadWriteLock bucketLock(String bucket) {
+    ReentrantReadWriteLock bucketLock(String bucket) {
         return bucketLocks[Math.floorMod(bucket.hashCode(), STRIPES)];
     }
 
-    private ReentrantLock objectLock(Path dir) {
+    ReentrantLock objectLock(Path dir) {
         return objectLocks[Math.floorMod(dir.hashCode(), STRIPES)];
     }
 
@@ -504,21 +594,31 @@ public final class LocalObjectStore implements ObjectStore {
         }
     }
 
-    private record FileObject(ObjectInfo info, FileChannel ch) implements StoredObject {
+    /** Bytes in one data file per part, read through channels opened together, so one version is read. */
+    private record FileObject(ObjectInfo info, List<FileChannel> channels) implements StoredObject {
         public void copyTo(long offset, long length, OutputStream out) throws IOException {
             ByteBuffer buf = ByteBuffer.allocate((int) Math.min(COPY_BUFFER, Math.max(length, 1)));
-            long pos = offset, end = offset + length;
-            while (pos < end) {
-                buf.clear().limit((int) Math.min(buf.capacity(), end - pos));
-                int n = ch.read(buf, pos);
-                if (n < 0) throw new IOException("data file shorter than its metadata says");
-                out.write(buf.array(), 0, n);
-                pos += n;
+            long partStart = 0, end = offset + length;
+            for (int i = 0; i < channels.size() && partStart < end; i++) {
+                long partSize = info.parts().get(i).size();
+                long partEnd = partStart + partSize;
+                if (partEnd > offset) {
+                    FileChannel ch = channels.get(i);
+                    long pos = Math.max(offset, partStart) - partStart, stop = Math.min(end, partEnd) - partStart;
+                    while (pos < stop) {
+                        buf.clear().limit((int) Math.min(buf.capacity(), stop - pos));
+                        int n = ch.read(buf, pos);
+                        if (n < 0) throw new IOException("data file shorter than its metadata says");
+                        out.write(buf.array(), 0, n);
+                        pos += n;
+                    }
+                }
+                partStart = partEnd;
             }
         }
 
         public void close() throws IOException {
-            ch.close();
+            for (FileChannel ch : channels) ch.close();
         }
     }
 }

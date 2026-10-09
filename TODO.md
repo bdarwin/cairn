@@ -6,7 +6,9 @@ Found and not done, worst first.
    PUT against 1,326 MiB/s streamed in probe 3. Chunk-signature checks, MD5, CRC32C and the
    request's checksum all run on the request thread. Not yet profiled.
 2. **Nothing sweeps up after a crash.** A write killed part-way leaves a `.data-*` or
-   `.meta-*.tmp` file in the object's directory. These are never read, but they use space, and they
+   `.meta-*.tmp` file in the object's directory; a CompleteMultipartUpload killed before its commit
+   leaves hard links there; abandoned multipart uploads stay under `.cairn/uploads` until aborted
+   (S3 offers a lifecycle rule for that; cairn has none). These are never read, but they use space, and they
    keep an otherwise empty directory from being removed.
 3. **`STREAMING-UNSIGNED-PAYLOAD-TRAILER` has only been tested with hand-built bodies.** SDKs send
    it over HTTPS, and no real client was captured sending it, because cairn has no TLS.
@@ -17,4 +19,6 @@ Found and not done, worst first.
    way to know would take listing from about 7,400 towards 10,000 keys a second.
 6. **Cold-cache listing is unmeasured** (macOS needs root to drop the file cache). The first listing
    of a 1,000,000-entry directory after a restart took 7.7 s to build its index.
-7. **Virtual-host-style addressing** (`bucket.host`) is not served; path style only.
+7. **GET with `?partNumber=` and UploadPartCopy are refused** (501). Some downloaders fetch
+   multipart objects part by part; none of the four clients tested here did.
+8. **Virtual-host-style addressing** (`bucket.host`) is not served; path style only.

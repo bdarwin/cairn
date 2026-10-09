@@ -21,21 +21,22 @@ import java.util.Map;
  *  "parts":[{"number":1,"size":5,"etag":"5d41...","crc32c":"mnG7TA=="}],"data":{"inline":5}}
  * </pre>
  *
- * {@code "data"} is either {@code {"inline": n}} or {@code {"file": ".data-<uuid>"}}, naming a file in
- * the same directory.
+ * {@code "data"} is either {@code {"inline": n}} or {@code {"files": [".data-<uuid>", ...]}}: one file
+ * per part, in the same directory, in part order. A completed multipart upload keeps its parts as
+ * they were uploaded (docs/multipart.md says why).
  */
 final class MetaFile {
 
     static final int FORMAT = 1;
 
-    /** A decoded {@code .meta}: the object's info, and where its bytes are. */
-    record Contents(ObjectInfo info, String dataFile, byte[] inline) {
+    /** A decoded {@code .meta}: the object's info, and where its bytes are: inline, or in files (one per part). */
+    record Contents(ObjectInfo info, List<String> dataFiles, byte[] inline) {
     }
 
     private MetaFile() {
     }
 
-    static byte[] encode(ObjectInfo info, String dataFile, byte[] inline) {
+    static byte[] encode(ObjectInfo info, List<String> dataFiles, byte[] inline) {
         Map<String, Object> m = new LinkedHashMap<>();
         m.put("format", FORMAT);
         m.put("key", info.key());
@@ -53,10 +54,11 @@ final class MetaFile {
             pm.put("size", p.size());
             pm.put("etag", p.etag());
             pm.put("crc32c", p.crc32c());
+            if (p.checksum() != null) pm.put("checksum", p.checksum());
             parts.add(pm);
         }
         m.put("parts", parts);
-        m.put("data", inline != null ? Map.of("inline", inline.length) : Map.of("file", dataFile));
+        m.put("data", inline != null ? Map.of("inline", inline.length) : Map.of("files", dataFiles));
         byte[] head = (Json.write(m) + "\n").getBytes(StandardCharsets.UTF_8);
         if (inline == null) return head;
         byte[] all = Arrays.copyOf(head, head.length + inline.length);
@@ -75,7 +77,8 @@ final class MetaFile {
         List<PartInfo> parts = new ArrayList<>();
         for (Object o : (List<Object>) m.get("parts")) {
             Map<String, Object> p = (Map<String, Object>) o;
-            parts.add(new PartInfo(((Long) p.get("number")).intValue(), (Long) p.get("size"), (String) p.get("etag"), (String) p.get("crc32c")));
+            parts.add(new PartInfo(((Long) p.get("number")).intValue(), (Long) p.get("size"), (String) p.get("etag"), (String) p.get("crc32c"),
+                    (String) p.get("checksum")));
         }
         ObjectInfo info = new ObjectInfo((String) m.get("key"), (Long) m.get("size"), (String) m.get("etag"),
                 Instant.ofEpochMilli((Long) m.get("lastModified")), (String) m.get("contentType"),
@@ -84,9 +87,12 @@ final class MetaFile {
         if (data.containsKey("inline")) {
             int n = ((Long) data.get("inline")).intValue();
             if (bytes.length - nl - 1 != n) throw new IllegalArgumentException("inline data is " + (bytes.length - nl - 1) + " bytes, header says " + n);
-            return new Contents(info, null, Arrays.copyOfRange(bytes, nl + 1, bytes.length));
+            return new Contents(info, List.of(), Arrays.copyOfRange(bytes, nl + 1, bytes.length));
         }
-        return new Contents(info, (String) data.get("file"), null);
+        List<String> files = new ArrayList<>();
+        for (Object name : (List<Object>) data.get("files")) files.add((String) name);
+        if (files.size() != parts.size()) throw new IllegalArgumentException(files.size() + " data files for " + parts.size() + " parts");
+        return new Contents(info, List.copyOf(files), null);
     }
 
     @SuppressWarnings("unchecked")

@@ -35,7 +35,9 @@ format number, so a reader that did not write it can tell what it holds:
 hello
 ```
 
-Every object records its parts, each with its own CRC32C. A plain PUT has one part. The per-part
+Every object records its parts, each with its own CRC32C. A plain PUT has one part. A completed
+multipart upload keeps one data file per part (see [Multipart upload](multipart.md)), and
+`"data"` lists them: `{"files":[".data-…-1",".data-…-2"]}`. The per-part
 checksum is there so that a later layout spread over several disks can check each piece on its own.
 
 ## Writes

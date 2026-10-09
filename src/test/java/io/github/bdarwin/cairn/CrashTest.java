@@ -124,6 +124,45 @@ class CrashTest {
         }
     }
 
+    /**
+     * CompleteMultipartUpload killed before its commit leaves the upload, which completes on a retry;
+     * killed after it leaves the whole object.
+     */
+    @ParameterizedTest(name = "complete crashes at {0}")
+    @CsvSource({"meta-forced", "renamed"})
+    void crashWhileCompletingAMultipartUpload(String point) throws Exception {
+        byte[] p1 = random(5 << 20, 1), p2 = random(1 << 20, 2);
+        String id;
+        List<software.amazon.awssdk.services.s3.model.CompletedPart> parts = new ArrayList<>();
+        try (Child c = Child.start(data, point); S3Client s3 = c.client()) {
+            s3.createBucket(b -> b.bucket("items"));
+            id = s3.createMultipartUpload(b -> b.bucket("items").key("big")).uploadId();
+            int n = 1;
+            for (byte[] p : List.of(p1, p2)) {
+                int number = n++;
+                String etag = s3.uploadPart(b -> b.bucket("items").key("big").uploadId(id).partNumber(number), RequestBody.fromBytes(p)).eTag();
+                parts.add(software.amazon.awssdk.services.s3.model.CompletedPart.builder().partNumber(number).eTag(etag).build());
+            }
+            assertThrows(RuntimeException.class, () -> s3.completeMultipartUpload(b -> b.bucket("items").key("big").uploadId(id)
+                    .multipartUpload(m -> m.parts(parts))));
+            assertEquals(99, c.waitForExit());
+        }
+        byte[] whole = new byte[p1.length + p2.length];
+        System.arraycopy(p1, 0, whole, 0, p1.length);
+        System.arraycopy(p2, 0, whole, p1.length, p2.length);
+        try (Child c = Child.start(data, null); S3Client s3 = c.client()) {
+            if (point.equals("renamed")) {
+                assertArrayEquals(whole, s3.getObjectAsBytes(b -> b.bucket("items").key("big")).asByteArray());
+            } else {
+                assertThrows(software.amazon.awssdk.services.s3.model.NoSuchKeyException.class,
+                        () -> s3.headObject(b -> b.bucket("items").key("big")));
+                assertEquals(2, s3.listParts(b -> b.bucket("items").key("big").uploadId(id)).parts().size());
+                s3.completeMultipartUpload(b -> b.bucket("items").key("big").uploadId(id).multipartUpload(m -> m.parts(parts)));
+                assertArrayEquals(whole, s3.getObjectAsBytes(b -> b.bucket("items").key("big")).asByteArray());
+            }
+        }
+    }
+
     private static long largestDataFile(Path root) throws IOException {
         try (Stream<Path> s = Files.walk(root)) {
             return s.filter(p -> p.getFileName().toString().startsWith(".data-")).mapToLong(p -> {

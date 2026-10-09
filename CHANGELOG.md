@@ -18,6 +18,10 @@
 - ListObjectsV2 and ListObjects: prefix, delimiter, max-keys, continuation token, start-after,
   marker, `encoding-type=url`, in UTF-8 key order. Large directories keep their sorted entries in
   memory, keyed by modification time; measured on 1,000,000 keys in `docs/listing.md`.
+- Multipart upload: create, upload part, complete, abort, ListParts, ListMultipartUploads. S3's
+  `md5-N` ETag; parts kept as hard-linked files rather than copied (measured: 0.22 s against 16.8 s
+  to complete 5 GiB); full-object CRC checksums combined from the parts', composite ones for the
+  rest. `mc` and the `aws` CLI upload 5 GiB files and read them back byte for byte.
 
 - Maven project (`io.github.bdarwin:cairn`, Java 21, no runtime dependencies).
 - Probes 1-5 with their measured results in `docs/probes.md`: `Expect: 100-continue` in the JDK

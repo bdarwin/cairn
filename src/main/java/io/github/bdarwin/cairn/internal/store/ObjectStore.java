@@ -40,6 +40,31 @@ public interface ObjectStore extends AutoCloseable {
     /** Deletes the object; false if there was none. */
     boolean delete(String bucket, String key) throws IOException;
 
+    // ---- multipart uploads ----
+
+    /** Starts a multipart upload; {@code checksumAlgorithm} (an algorithm name) and {@code checksumType} may be null. */
+    Upload createUpload(String bucket, String key, NewObject attributes, String checksumAlgorithm, String checksumType) throws IOException;
+
+    /** The upload, if it exists and is for {@code key}; NoSuchUpload otherwise. */
+    Upload upload(String bucket, String key, String uploadId) throws IOException;
+
+    /**
+     * Stores a part, replacing one with the same number. {@code check} runs before the part is kept and
+     * puts the part's checksums, by algorithm name, into {@code checksums}.
+     */
+    PartInfo putPart(String bucket, String key, String uploadId, int partNumber, InputStream body, BeforeCommit check,
+                     java.util.Map<String, String> checksums) throws IOException;
+
+    List<UploadedPart> parts(String bucket, String key, String uploadId) throws IOException;
+
+    /** Turns the named parts into the object, replacing any object at {@code key}, and ends the upload. */
+    ObjectInfo completeUpload(String bucket, String key, String uploadId, List<CompletedPart> parts) throws IOException;
+
+    void abortUpload(String bucket, String key, String uploadId) throws IOException;
+
+    /** Uploads in progress, by key and then initiation time. */
+    List<Upload> uploads(String bucket) throws IOException;
+
     @Override
     default void close() throws IOException {
     }

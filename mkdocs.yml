@@ -24,6 +24,7 @@ nav:
   - Design:
       - Storage: storage.md
       - Listing: listing.md
+      - Multipart upload: multipart.md
       - Probes: probes.md
 
 markdown_extensions:
