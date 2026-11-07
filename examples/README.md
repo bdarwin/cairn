@@ -32,3 +32,8 @@ three copies of the file.
 | `MultipartBigFile` | `aws` CLI and `mc` upload a 5 GiB file by multipart and read it back |
 | `probes/ProbeMultipartComplete` | Completing by copying the parts against keeping them: time, disk, read speed |
 | `probes/ProbeDirectoryCost`, `probes/ProbeListingCost` | Where a listing page's time goes |
+| `DuckDbReadsWhatItNeeds`, `CountingProxy` | DuckDB writes Parquet to cairn; the bytes cairn serves for four queries against the file's size |
+| `probes/ProbeStalledDownloads` | Stalled downloads against the JDK server, virtual against platform threads, on JDK 21 and 25 |
+
+The DuckDB example needs `--enable-native-access=ALL-UNNAMED` and the full classpath:
+`java --enable-native-access=ALL-UNNAMED -cp target/classes:$(mvn -q dependency:build-classpath -Dmdep.outputFile=/dev/stdout) ...`

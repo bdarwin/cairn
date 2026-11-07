@@ -181,3 +181,24 @@ Output (2026-10-08, Apple M1 Max, internal SSD, APFS, JDK 21.0.11, AWS SDK 2.55.
    aws-cli/2.37.10 Python/3.14.8 Darwin/25.5.0 source/arm64
    aws s3 cp 5 MiB up 0.56 s, down 0.32 s (each includes CLI start-up), cmp: identical
 */
+
+/*
+Output again (2026-11-07, same machine, JDK 21.0.11), after requests moved from virtual to platform threads on JDK 21-23
+(see docs/duckdb.md). The same range as above: 1 GiB faster, 1 MiB GET slower, concurrent small PUTs 154 against 161 a second.
+
+   java 21.0.11, 10 cores
+
+   AWS SDK for Java v2, one client, sequential (PUT includes the forces that make it durable)
+       size      n   PUT mean    GET mean    PUT MiB/s   GET MiB/s   bytes identical
+      1 KiB     50    28.26 ms     3.65 ms         0.0         0.3   true
+      1 MiB     50    38.71 ms     4.29 ms        25.8       233.4   true
+     64 MiB      5   215.27 ms    50.64 ms       297.3      1263.9   true
+      1 GiB      2  2991.54 ms  1036.28 ms       342.3       988.1   true
+
+   1 KiB PUTs from concurrent clients (each its own thread, shared connection pool)
+      1 clients: 400 PUTs in 7.75 s = 52 PUT/s
+     16 clients: 400 PUTs in 2.59 s = 154 PUT/s
+
+   aws-cli/2.37.10 Python/3.14.8 Darwin/25.5.0 source/arm64
+   aws s3 cp 5 MiB up 0.56 s, down 0.32 s (each includes CLI start-up), cmp: identical
+*/

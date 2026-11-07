@@ -67,6 +67,13 @@
             <scope>test</scope>
         </dependency>
         <dependency>
+            <!-- DuckDB as a client: COPY to and read_parquet from s3:// through cairn. Its httpfs extension is downloaded on first use. -->
+            <groupId>org.duckdb</groupId>
+            <artifactId>duckdb_jdbc</artifactId>
+            <version>2.0.0.0</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
             <!-- The SDK computes CRC64NVME only through the CRT. -->
             <groupId>software.amazon.awssdk.crt</groupId>
             <artifactId>aws-crt</artifactId>
@@ -86,6 +93,10 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
                 <version>3.5.2</version>
+                <configuration>
+                    <!-- DuckDB's JDBC driver loads a native library. -->
+                    <argLine>--enable-native-access=ALL-UNNAMED</argLine>
+                </configuration>
             </plugin>
         </plugins>
     </build>

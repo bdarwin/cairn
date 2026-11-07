@@ -21,6 +21,8 @@ theme:
 nav:
   - Home: index.md
   - Getting started: getting-started.md
+  - Clients:
+      - DuckDB: duckdb.md
   - Design:
       - Storage: storage.md
       - Listing: listing.md

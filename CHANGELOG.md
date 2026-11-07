@@ -2,7 +2,22 @@
 
 ## Unreleased
 
+### Fixed
+
+- On JDK 21 to 23, as many stalled downloads as there are cores stopped the whole server: a virtual
+  thread blocked writing a response held its carrier thread, because the JDK `HttpServer` writes
+  under a monitor. Requests now run on platform threads before JDK 24, and on virtual threads from
+  24 (`SlowReadersTest`, `ProbeStalledDownloads`). Found by DuckDB's parallel ranged reads.
+- `CompleteMultipartUpload` did not check its body against the signed `x-amz-content-sha256`.
+
 ### Added
+
+- DeleteObjects (`POST /bucket?delete`), up to 1,000 keys, quiet or verbose, its body checked like a
+  PUT's. DuckDB's `COPY ... (PARTITION_BY ..., OVERWRITE)` needs it, and failed with 405 before.
+- DuckDB acceptance tests (`DuckDbTest`, DuckDB JDBC 2.0.0.0 as a test dependency, and the `duckdb`
+  CLI when installed): `COPY ... TO 's3://...'` including multipart, `read_parquet` over globs of up
+  to 1,100 files, hive partitions, `OVERWRITE`, escaped keys, CSV, JSON, `ATTACH` of a database
+  file. `DuckDbReadsWhatItNeeds` measures the bytes served per query, in `docs/duckdb.md`.
 
 - Objects end to end: buckets (create, delete, head, list) and objects (PUT, GET with `Range`,
   HEAD, DELETE) over HTTP, on the JDK's `HttpServer` with virtual threads.

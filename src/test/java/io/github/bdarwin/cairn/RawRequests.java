@@ -49,6 +49,21 @@ final class RawRequests {
         return sendAsIs(method, uri, sentBody, signed.request().headers());
     }
 
+    /** The headers of a signed request with no body, Host included, for writing to a socket by hand. */
+    Map<String, java.util.List<String>> signedHeaders(String method, String pathAndQuery) {
+        URI uri = endpoint.resolve(pathAndQuery);
+        SdkHttpRequest request = SdkHttpRequest.builder().method(SdkHttpMethod.fromValue(method)).uri(uri)
+                .putHeader("Host", uri.getHost() + ":" + uri.getPort()).build();
+        return AwsV4HttpSigner.create().sign(s -> s.identity(AwsCredentialsIdentity.create(TestServer.ACCESS_KEY, TestServer.SECRET_KEY))
+                .request(request)
+                .payload(ContentStreamProvider.fromByteArray(new byte[0]))
+                .putProperty(AwsV4HttpSigner.SERVICE_SIGNING_NAME, "s3")
+                .putProperty(AwsV4HttpSigner.REGION_NAME, "us-east-1")
+                .putProperty(AwsV4HttpSigner.DOUBLE_URL_ENCODE, false)
+                .putProperty(AwsV4HttpSigner.NORMALIZE_PATH, false)
+                .putProperty(AwsV4HttpSigner.PAYLOAD_SIGNING_ENABLED, true)).request().headers();
+    }
+
     HttpResponse<String> sendAsIs(String method, URI uri, byte[] body, Map<String, java.util.List<String>> headers) throws IOException, InterruptedException {
         HttpRequest.Builder r = HttpRequest.newBuilder(uri).method(method, body == null || body.length == 0
                 ? HttpRequest.BodyPublishers.noBody() : HttpRequest.BodyPublishers.ofByteArray(body));

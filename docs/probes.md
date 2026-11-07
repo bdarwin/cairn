@@ -147,6 +147,12 @@ The stored file was byte-for-byte identical to the source.
 
 **Consequence.** Keep the JDK server. Copy bodies in full buffers.
 
+!!! note "Found later: virtual threads pin on JDK 21"
+    One client at a time cannot show it. In milestone 5, ten stalled downloads on this 10-core
+    machine stopped the whole server: up to JDK 23 a virtual thread blocked inside a monitor keeps
+    its carrier thread, and the JDK server writes bodies inside one. Requests now run on platform
+    threads before JDK 24 and on virtual threads from 24 on. See [DuckDB](duckdb.md#a-server-that-froze).
+
 ## 4. The cost of `fsync`
 
 **Question.** What does making a file durable cost on this machine, at 4 KiB, 1 MiB and 64 MiB?

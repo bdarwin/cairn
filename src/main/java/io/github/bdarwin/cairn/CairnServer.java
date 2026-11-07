@@ -119,11 +119,22 @@ public final class CairnServer implements AutoCloseable {
             if (credentials.isEmpty()) throw new IllegalStateException("no credentials configured");
             LocalObjectStore store = new LocalObjectStore(dataDirectory, clock, durable);
             HttpServer http = HttpServer.create(new InetSocketAddress(bindAddress, port), 1024);
-            ExecutorService executor = Executors.newVirtualThreadPerTaskExecutor();
+            ExecutorService executor = requestThreads(Runtime.version().feature());
             http.setExecutor(executor);
             http.createContext("/", new S3Handler(store, new Authenticator(credentials, clock), region));
             http.start();
             return new CairnServer(http, executor, store);
         }
+    }
+
+    /**
+     * One thread per request: virtual on JDK 24 and later, platform threads before. Up to JDK 23 a
+     * virtual thread that blocks inside a monitor holds its carrier thread (JEP 491 ended that in 24),
+     * and the JDK's HttpServer reads and writes bodies inside one. On JDK 21, as many clients as there
+     * are cores reading their downloads slowly then stopped every other request (SlowReadersTest).
+     */
+    static ExecutorService requestThreads(int javaFeatureVersion) {
+        if (javaFeatureVersion >= 24) return Executors.newVirtualThreadPerTaskExecutor();
+        return Executors.newCachedThreadPool(Thread.ofPlatform().name("cairn-request-", 0).daemon(true).factory());
     }
 }

@@ -34,6 +34,32 @@ class RawRequestsTest {
     }
 
     @Test
+    void xmlBodiesAreCheckedAgainstTheirSignature() throws Exception {
+        // A body that is not the one signed is refused, as a PUT's is; CompleteMultipartUpload once took it as sent.
+        HttpResponse<String> created = raw.send("POST", "/items/obj?uploads", null, Map.of());
+        String id = created.body().replaceAll("(?s).*<UploadId>(.*)</UploadId>.*", "$1");
+        HttpResponse<String> part = raw.send("PUT", "/items/obj?partNumber=1&uploadId=" + id, "a part".getBytes(StandardCharsets.UTF_8), Map.of());
+        assertEquals(200, part.statusCode(), part.body());
+        String etag = part.headers().firstValue("ETag").orElseThrow();
+        String complete = "<CompleteMultipartUpload><Part><PartNumber>1</PartNumber><ETag>" + etag + "</ETag></Part></CompleteMultipartUpload>";
+        HttpResponse<String> tampered = raw.sendSignedFor("POST", "/items/obj?uploadId=" + id, complete.getBytes(StandardCharsets.UTF_8),
+                complete.replace("<PartNumber>1<", "<PartNumber>2<").getBytes(StandardCharsets.UTF_8), Map.of());
+        assertEquals(400, tampered.statusCode(), tampered.body());
+        assertTrue(tampered.body().contains("<Code>XAmzContentSHA256Mismatch</Code>"), tampered.body());
+        assertEquals(200, raw.send("POST", "/items/obj?uploadId=" + id, complete.getBytes(StandardCharsets.UTF_8), Map.of()).statusCode());
+
+        String delete = "<Delete><Object><Key>obj</Key></Object><Quiet>true</Quiet></Delete>";
+        HttpResponse<String> tamperedDelete = raw.sendSignedFor("POST", "/items?delete", delete.getBytes(StandardCharsets.UTF_8),
+                delete.replace("true", "TRUE").getBytes(StandardCharsets.UTF_8), Map.of());
+        assertEquals(400, tamperedDelete.statusCode(), tamperedDelete.body());
+        assertEquals(200, raw.send("HEAD", "/items/obj", null, Map.of()).statusCode(), "nothing was deleted");
+        HttpResponse<String> badMd5 = raw.send("POST", "/items?delete", delete.getBytes(StandardCharsets.UTF_8), Map.of("Content-MD5", "AAAAAAAAAAAAAAAAAAAAAA=="));
+        assertTrue(badMd5.body().contains("<Code>BadDigest</Code>"), badMd5.body());
+        assertEquals(200, raw.send("POST", "/items?delete", delete.getBytes(StandardCharsets.UTF_8), Map.of()).statusCode());
+        assertEquals(404, raw.send("HEAD", "/items/obj", null, Map.of()).statusCode());
+    }
+
+    @Test
     void invalidBucketNames() throws Exception {
         for (String name : List.of("ab", "192.168.5.4", "a..b", "xn--abc", "-abc", "abc-", "a".repeat(64), "Upper")) {
             HttpResponse<String> r = raw.send("PUT", "/" + name, null, Map.of());

@@ -12,10 +12,13 @@ import software.amazon.awssdk.services.s3.model.Bucket;
 import software.amazon.awssdk.services.s3.model.BucketAlreadyOwnedByYouException;
 import software.amazon.awssdk.services.s3.model.ChecksumAlgorithm;
 import software.amazon.awssdk.services.s3.model.ChecksumMode;
+import software.amazon.awssdk.services.s3.model.DeleteObjectsResponse;
+import software.amazon.awssdk.services.s3.model.DeletedObject;
 import software.amazon.awssdk.services.s3.model.GetObjectResponse;
 import software.amazon.awssdk.services.s3.model.HeadObjectResponse;
 import software.amazon.awssdk.services.s3.model.NoSuchBucketException;
 import software.amazon.awssdk.services.s3.model.NoSuchKeyException;
+import software.amazon.awssdk.services.s3.model.ObjectIdentifier;
 import software.amazon.awssdk.services.s3.model.PutObjectResponse;
 import software.amazon.awssdk.services.s3.model.S3Exception;
 
@@ -30,6 +33,7 @@ import java.util.HexFormat;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
+import java.util.stream.IntStream;
 
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -186,6 +190,28 @@ class ObjectsSdkTest {
         assertThrows(NoSuchKeyException.class, () -> s3.headObject(b -> b.bucket("items").key("k")));
         s3.deleteObject(b -> b.bucket("items").key("k"));
         assertThrows(NoSuchBucketException.class, () -> s3.getObjectAsBytes(b -> b.bucket("absent").key("k")));
+    }
+
+    @Test
+    void deleteObjectsInOneRequest() {
+        // DuckDB's COPY ... (OVERWRITE) sends DeleteObjects; this was refused with 405 before.
+        List<String> keys = List.of("a", "dir/b", "x&y <z>", "absent");
+        for (String k : keys.subList(0, 3)) s3.putObject(b -> b.bucket("items").key(k), RequestBody.fromString(k));
+        List<ObjectIdentifier> ids = keys.stream().map(k -> ObjectIdentifier.builder().key(k).build()).toList();
+        DeleteObjectsResponse result = s3.deleteObjects(b -> b.bucket("items").delete(d -> d.objects(ids)));
+        assertEquals(keys, result.deleted().stream().map(DeletedObject::key).toList(), "S3 reports a key that was not there as deleted");
+        assertTrue(result.errors().isEmpty(), result.errors().toString());
+        assertEquals(0, s3.listObjectsV2(b -> b.bucket("items")).keyCount());
+
+        s3.putObject(b -> b.bucket("items").key("a"), RequestBody.fromString("a"));
+        DeleteObjectsResponse quiet = s3.deleteObjects(b -> b.bucket("items").delete(d -> d.objects(ids).quiet(true)));
+        assertTrue(quiet.deleted().isEmpty() && quiet.errors().isEmpty(), "quiet mode reports only errors");
+        assertEquals(0, s3.listObjectsV2(b -> b.bucket("items")).keyCount());
+
+        List<ObjectIdentifier> tooMany = IntStream.range(0, 1001).mapToObj(i -> ObjectIdentifier.builder().key("k" + i).build()).toList();
+        S3Exception e = assertThrows(S3Exception.class, () -> s3.deleteObjects(b -> b.bucket("items").delete(d -> d.objects(tooMany))));
+        assertEquals("MalformedXML", e.awsErrorDetails().errorCode());
+        assertThrows(NoSuchBucketException.class, () -> s3.deleteObjects(b -> b.bucket("absent").delete(d -> d.objects(ids))));
     }
 
     @Test

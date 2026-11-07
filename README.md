@@ -8,6 +8,8 @@ that unmodified clients - the AWS SDK, the `aws` CLI, `mc` and DuckDB - work aga
 noticing.
 
 Status: buckets, objects, listing and multipart upload work end to end (PUT, GET with ranges, HEAD,
-DELETE, ListObjectsV2, multipart, SigV4, checksums); `mc` and the `aws` CLI upload 5 GiB files. DuckDB is next. Docs in `docs/`, found-and-not-done in `TODO.md`.
+DELETE, DeleteObjects, ListObjectsV2, multipart, SigV4, checksums); `mc` and the `aws` CLI upload
+5 GiB files; DuckDB writes and reads Parquet through `s3://`, fetching 0.34 % of a 197 MB file for
+one column of one row group. Docs in `docs/`, found-and-not-done in `TODO.md`.
 
 Java 21. Apache 2.0.

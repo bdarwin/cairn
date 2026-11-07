@@ -59,14 +59,24 @@ AWS_ACCESS_KEY_ID=example-key AWS_SECRET_ACCESS_KEY=example-secret AWS_DEFAULT_R
   aws --endpoint-url http://localhost:9000 s3 cp reading.bin s3://items/reading.bin
 ```
 
+DuckDB (see [DuckDB](duckdb.md)):
+
+```sql
+LOAD httpfs;
+CREATE SECRET (TYPE s3, KEY_ID 'example-key', SECRET 'example-secret',
+               ENDPOINT 'localhost:9000', URL_STYLE 'path', USE_SSL false);
+COPY (SELECT * FROM range(10)) TO 's3://items/x.parquet';
+SELECT count(*) FROM read_parquet('s3://items/*.parquet');
+```
+
 ## What works so far
 
 | Area | State |
 |---|---|
 | Buckets | create, delete (empty only), head, list |
-| Objects | PUT, GET (with `Range`), HEAD, DELETE |
+| Objects | PUT, GET (with `Range`), HEAD, DELETE, DeleteObjects |
 | Multipart | create, upload part, complete, abort, ListParts, ListMultipartUploads; full-object and composite checksums |
 | Listing | ListObjectsV2 and ListObjects: prefix, delimiter, max-keys, continuation token, start-after, marker, `encoding-type=url` |
 | Auth | SigV4 in the header; all three `aws-chunked` body forms |
 | Integrity | `Content-MD5`; `x-amz-checksum-*` CRC32, CRC32C, CRC64NVME, SHA-1, SHA-256, as headers or trailers |
-| Not yet | UploadPartCopy, GET with `partNumber`, presigned URLs, conditional requests, CopyObject, DeleteObjects |
+| Not yet | UploadPartCopy, GET with `partNumber`, presigned URLs, conditional requests, CopyObject |

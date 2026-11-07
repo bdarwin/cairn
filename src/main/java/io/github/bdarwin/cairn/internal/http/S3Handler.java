@@ -49,6 +49,9 @@ public final class S3Handler implements HttpHandler {
     private static final int MAX_KEY_BYTES = 1024;
     private static final int MAX_USER_METADATA = 2048;
     private static final int MAX_PARTS = 10_000;
+    private static final int MAX_DELETE_KEYS = 1000;
+    /** 1,000 keys of 1,024 bytes, with room for XML escaping. */
+    private static final int MAX_DELETE_BODY = 8 << 20;
     private static final Pattern BUCKET_NAME = Pattern.compile("[a-z0-9][a-z0-9.-]{1,61}[a-z0-9]");
     private static final Pattern IP_ADDRESS = Pattern.compile("\\d+\\.\\d+\\.\\d+\\.\\d+");
     /** Headers stored with an object and returned on GET and HEAD. */
@@ -102,13 +105,13 @@ public final class S3Handler implements HttpHandler {
             throw methodNotAllowed();
         }
         if (r.key == null) {
-            routeBucket(r, ex);
+            routeBucket(r, auth, ex);
         } else {
             routeObject(r, auth, ex);
         }
     }
 
-    private void routeBucket(Request r, HttpExchange ex) throws IOException {
+    private void routeBucket(Request r, AuthContext auth, HttpExchange ex) throws IOException {
         switch (r.method) {
             case "PUT" -> {
                 refuseSubresources(r);
@@ -146,6 +149,11 @@ public final class S3Handler implements HttpHandler {
                     if ("2".equals(r.param("list-type"))) listObjectsV2(r, ex);
                     else listObjectsV1(r, ex);
                 }
+            }
+            case "POST" -> {
+                if (!r.has("delete")) throw methodNotAllowed();
+                refuseSubresources(r, "delete");
+                deleteObjects(r, auth, ex);
             }
             default -> throw methodNotAllowed();
         }
@@ -193,7 +201,7 @@ public final class S3Handler implements HttpHandler {
                     createUpload(r, ex);
                 } else if (r.has("uploadId")) {
                     refuseSubresources(r, "uploadId");
-                    completeUpload(r, ex);
+                    completeUpload(r, auth, ex);
                 } else {
                     refuseSubresources(r);
                     throw methodNotAllowed();
@@ -302,6 +310,64 @@ public final class S3Handler implements HttpHandler {
         }
     }
 
+    /**
+     * DeleteObjects: up to 1,000 keys in one request. As in S3, a key that is not there counts as
+     * deleted, and {@code <Quiet>} leaves out the keys that were. S3 insists on {@code Content-MD5} or
+     * an {@code x-amz-checksum-*} header; cairn checks one if it is sent, and does not insist.
+     */
+    private void deleteObjects(Request r, AuthContext auth, HttpExchange ex) throws IOException {
+        requireBucket(r.bucket);
+        org.w3c.dom.Element root = Xml.parse(smallBody(r, auth, ex, MAX_DELETE_BODY)).getDocumentElement();
+        if (!"Delete".equals(root.getLocalName())) throw malformedXml();
+        org.w3c.dom.NodeList objects = root.getElementsByTagNameNS("*", "Object");
+        if (objects.getLength() == 0 || objects.getLength() > MAX_DELETE_KEYS) throw malformedXml();
+        List<String> keys = new ArrayList<>();
+        for (int i = 0; i < objects.getLength(); i++) {
+            String key = text((org.w3c.dom.Element) objects.item(i), "Key");
+            if (key == null || key.isEmpty()) throw malformedXml();
+            keys.add(key);
+        }
+        String quietText = text(root, "Quiet");
+        boolean quiet = quietText != null && quietText.trim().equalsIgnoreCase("true");
+        StringBuilder sb = new StringBuilder("<DeleteResult xmlns=\"" + Xml.NS + "\">");
+        for (String key : keys) {
+            try {
+                if (key.getBytes(StandardCharsets.UTF_8).length > MAX_KEY_BYTES) throw new S3Exception(400, "KeyTooLongError", "Your key is too long");
+                store.delete(r.bucket, key);
+                if (quiet) continue;
+                sb.append("<Deleted>");
+                Xml.element(sb, "Key", key);
+                sb.append("</Deleted>");
+            } catch (S3Exception e) {
+                sb.append("<Error>");
+                Xml.element(sb, "Key", key);
+                Xml.element(sb, "Code", e.code());
+                Xml.element(sb, "Message", e.getMessage());
+                sb.append("</Error>");
+            }
+        }
+        sb.append("</DeleteResult>");
+        sendXml(ex, 200, sb.toString());
+    }
+
+    /** A request body small enough to hold in memory, read and checked like a PUT's (signed SHA-256, Content-MD5, x-amz-checksum-*). */
+    private static byte[] smallBody(Request r, AuthContext auth, HttpExchange ex, int limit) throws IOException {
+        IncomingBody in = IncomingBody.of(r, auth, ex, null);
+        if (in.declared > limit) throw malformedXml();
+        byte[] body = in.body.readNBytes(limit + 1);
+        if (body.length > limit) throw malformedXml();
+        try {
+            in.check(new LinkedHashMap<>()).check(body.length, MessageDigest.getInstance("MD5").digest(body));
+        } catch (java.security.NoSuchAlgorithmException e) {
+            throw new IllegalStateException(e);
+        }
+        return body;
+    }
+
+    private static S3Exception malformedXml() {
+        return new S3Exception(400, "MalformedXML", "The XML you provided was not well-formed or did not validate against our published schema.");
+    }
+
     // ---- multipart uploads ----
 
     private void createUpload(Request r, HttpExchange ex) throws IOException {
@@ -355,9 +421,9 @@ public final class S3Handler implements HttpHandler {
         send(ex, 200, null);
     }
 
-    private void completeUpload(Request r, HttpExchange ex) throws IOException {
+    private void completeUpload(Request r, AuthContext auth, HttpExchange ex) throws IOException {
         Upload u = store.upload(r.bucket, r.key, r.param("uploadId"));
-        org.w3c.dom.Document doc = Xml.parse(ex.getRequestBody().readNBytes(4 << 20));
+        org.w3c.dom.Document doc = Xml.parse(smallBody(r, auth, ex, 4 << 20));
         List<CompletedPart> parts = new ArrayList<>();
         org.w3c.dom.NodeList list = doc.getDocumentElement().getElementsByTagNameNS("*", "Part");
         String checksumElement = u.checksumAlgorithm() == null ? null : "Checksum" + u.checksumAlgorithm();
