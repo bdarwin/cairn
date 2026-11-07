@@ -23,6 +23,7 @@ nav:
   - Getting started: getting-started.md
   - Clients:
       - DuckDB: duckdb.md
+      - quackjvm: quackjvm.md
   - Design:
       - Storage: storage.md
       - Listing: listing.md

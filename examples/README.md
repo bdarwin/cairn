@@ -33,6 +33,7 @@ three copies of the file.
 | `probes/ProbeMultipartComplete` | Completing by copying the parts against keeping them: time, disk, read speed |
 | `probes/ProbeDirectoryCost`, `probes/ProbeListingCost` | Where a listing page's time goes |
 | `DuckDbReadsWhatItNeeds`, `CountingProxy` | DuckDB writes Parquet to cairn; the bytes cairn serves for four queries against the file's size |
+| `QuackjvmOnCairn` | quackjvm 1.6.1 (from Maven Central) exports a table to `s3://` on cairn and reads it back; every route it offers, tried |
 | `probes/ProbeStalledDownloads` | Stalled downloads against the JDK server, virtual against platform threads, on JDK 21 and 25 |
 
 The DuckDB example needs `--enable-native-access=ALL-UNNAMED` and the full classpath:

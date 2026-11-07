@@ -10,6 +10,8 @@ noticing.
 Status: buckets, objects, listing and multipart upload work end to end (PUT, GET with ranges, HEAD,
 DELETE, DeleteObjects, ListObjectsV2, multipart, SigV4, checksums); `mc` and the `aws` CLI upload
 5 GiB files; DuckDB writes and reads Parquet through `s3://`, fetching 0.34 % of a 197 MB file for
-one column of one row group. Docs in `docs/`, found-and-not-done in `TODO.md`.
+one column of one row group; quackjvm 1.6.1 exports a table to cairn and reads it back through
+raw SQL, with its gaps written up in `docs/quackjvm.md`. Docs in `docs/`, found-and-not-done in
+`TODO.md`.
 
 Java 21. Apache 2.0.

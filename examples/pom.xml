@@ -44,6 +44,17 @@
             <version>2.0.0.0</version>
         </dependency>
         <dependency>
+            <!-- quackjvm as a client of cairn (QuackjvmOnCairn), from Maven Central; never a dependency of cairn itself -->
+            <groupId>io.github.bdarwin</groupId>
+            <artifactId>quackjvm-core</artifactId>
+            <version>1.6.1</version>
+        </dependency>
+        <dependency>
+            <groupId>io.github.bdarwin</groupId>
+            <artifactId>quackjvm-agent</artifactId>
+            <version>1.6.1</version>
+        </dependency>
+        <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-nop</artifactId>
             <version>2.0.16</version>

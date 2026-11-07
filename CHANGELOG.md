@@ -18,6 +18,9 @@
   CLI when installed): `COPY ... TO 's3://...'` including multipart, `read_parquet` over globs of up
   to 1,100 files, hive partitions, `OVERWRITE`, escaped keys, CSV, JSON, `ATTACH` of a database
   file. `DuckDbReadsWhatItNeeds` measures the bytes served per query, in `docs/duckdb.md`.
+- quackjvm as a client (`QuackjvmOnCairn`, quackjvm 1.6.1 from Maven Central in the examples only):
+  a table exported to `s3://` on cairn and read back, measure tables archived there and queried. The
+  gaps found, which are quackjvm's, are in `docs/quackjvm.md`.
 
 - Objects end to end: buckets (create, delete, head, list) and objects (PUT, GET with `Range`,
   HEAD, DELETE) over HTTP, on the JDK's `HttpServer` with virtual threads.

@@ -33,3 +33,6 @@ Found and not done, worst first.
 11. **DeleteObjects does not insist on `Content-MD5` or a checksum header,** as S3 does. It checks
    one when sent (DuckDB sends `Content-MD5`). A `VersionId` in the request is ignored, since
    cairn has no versioning.
+
+What quackjvm would need to use cairn well (S3 configuration that is not SQL text, URL prefixes in
+its hardening allow-list) is quackjvm's to do, and is written up in `docs/quackjvm.md`.
