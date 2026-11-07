@@ -18,9 +18,14 @@
   CLI when installed): `COPY ... TO 's3://...'` including multipart, `read_parquet` over globs of up
   to 1,100 files, hive partitions, `OVERWRITE`, escaped keys, CSV, JSON, `ATTACH` of a database
   file. `DuckDbReadsWhatItNeeds` measures the bytes served per query, in `docs/duckdb.md`.
-- quackjvm as a client (`QuackjvmOnCairn`, quackjvm 1.6.1 from Maven Central in the examples only):
-  a table exported to `s3://` on cairn and read back, measure tables archived there and queried. The
-  gaps found, which are quackjvm's, are in `docs/quackjvm.md`.
+- quackjvm as a client (`QuackjvmOnCairn`, quackjvm 1.7.0 from Maven Central in the examples only):
+  an `ObjectStore` names cairn and its keys; `exportTable` sends a table to `s3://` on cairn by
+  multipart upload and it reads back as records; measure tables are archived there and queried; a
+  hardened database and a `QuerySession` read the allowed bucket and refuse others. 1.7.0 resolved
+  five of the six gaps the first run (on 1.6.1) found; the rest is in `docs/quackjvm.md`, with why an
+  allowed `s3://items/` does not stop `s3://items/../other/...` (cairn refused it only because
+  DuckDB signs a path other than the one it sends) and why that makes per-key bucket permissions
+  matter (`TODO.md`).
 
 - Objects end to end: buckets (create, delete, head, list) and objects (PUT, GET with `Range`,
   HEAD, DELETE) over HTTP, on the JDK's `HttpServer` with virtual threads.
